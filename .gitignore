@@ -1,0 +1,54 @@
+# =============================================================================
+# Catalogo+WA — .gitignore
+# Production-quality baseline. Some sections cover tooling introduced in later
+# sprints (Next.js, tests, Docker); they are listed now so those artifacts can
+# never be committed by accident.
+# =============================================================================
+
+# --- Dependencies -----------------------------------------------------------
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+
+# --- Environment files ------------------------------------------------------
+# Ignore every real env file, but KEEP the tracked template `.env.example`.
+# (`.env.example` matches `.env.*`, so it must be explicitly un-ignored.)
+.env
+.env.*
+!.env.example
+
+# --- Next.js / build output (Sprint 1.2+) -----------------------------------
+/.next/
+/out/
+/dist/
+/build/
+next-env.d.ts
+*.tsbuildinfo
+
+# --- Tests & coverage (Sprint 1.5) ------------------------------------------
+/coverage/
+/.nyc_output/
+
+# --- Playwright (Sprint 1.5) ------------------------------------------------
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/blob-report/
+
+# --- Logs -------------------------------------------------------------------
+logs/
+*.log
+
+# --- Docker local data (Sprint 1.4) -----------------------------------------
+# Local bind-mounted volume data must never be committed.
+/docker-data/
+
+# --- OS files ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editor / IDE (personal) ------------------------------------------------
+.idea/
+*.swp
+*.swo

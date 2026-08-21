@@ -1,0 +1,18 @@
+# Normalize all text files to LF inside the repository.
+# Windows is the primary dev environment: working-tree files may be CRLF
+# locally, but what git stores stays LF for cross-platform consistency.
+* text=auto eol=lf
+
+# Shell scripts must stay LF even on Windows checkouts.
+*.sh text eol=lf
+
+# Treat common binaries as binary (no EOL/diff munging).
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.woff  binary
+*.woff2 binary

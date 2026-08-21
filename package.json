@@ -1,0 +1,11 @@
+{
+  "name": "catalogo-wa",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Multi-tenant white-label catalog + WhatsApp ordering SaaS (Catalogo+WA).",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.11.0 <23.0.0",
+    "pnpm": ">=10 <11"
+  }
+}

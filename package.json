@@ -1,8 +1,8 @@
 {
-  "name": "catalogo-wa",
+  "name": "vitrina",
   "version": "0.0.0",
   "private": true,
-  "description": "Multi-tenant white-label catalog + WhatsApp ordering SaaS (Catalogo+WA).",
+  "description": "Vitrina: catálogos en línea con pedidos por WhatsApp para empresas.",
   "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=22.11.0 <23.0.0",

@@ -1,4 +1,4 @@
-# Initial Database Design — `Catalogo+WA`
+# Initial Database Design: Vitrina
 
 - **Status:** Proposed (Phase 0) — awaiting Director approval
 - **Engine:** PostgreSQL 16 · **ORM/migrations:** Drizzle + drizzle-kit (explicit migrations only)

@@ -1,5 +1,5 @@
 {
-  "//": "TypeScript POLICY for Catalogo+WA (Sprint 1.1). Strict baseline. Sprint 1.2 extends this for Next.js (adds DOM lib, jsx, the next plugin). No 'any' is permitted as a shortcut.",
+  "//": "TypeScript POLICY for Vitrina (Sprint 1.1). Strict baseline. Sprint 1.2 extends this for Next.js (adds DOM lib, jsx, the next plugin). No 'any' is permitted as a shortcut.",
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],

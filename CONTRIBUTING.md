@@ -1,4 +1,4 @@
-# Contributing — Catalogo+WA
+# Contributing: Vitrina
 
 This project runs a **phase-gated** process. Implementation happens only for the currently approved sprint; architectural decisions live in `docs/adr/` and must not be changed silently.
 

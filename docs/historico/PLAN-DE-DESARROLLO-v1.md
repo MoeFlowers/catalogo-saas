@@ -1,3 +1,6 @@
+> Documento histórico. Su modelo de negocio (operador que alquila la plataforma) fue reemplazado el
+> 2026-10-11 por `docs/PLAN-MAESTRO.md`. Se conserva como referencia; no guía el desarrollo.
+
 # Plan de Desarrollo — Plataforma de Catálogos + WhatsApp (SaaS multi-tenant)
 
 > **Modelo:** Opción 2 — Licencia / Alquiler. La plataforma es **propiedad del desarrollador**

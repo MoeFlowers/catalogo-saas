@@ -1,4 +1,4 @@
-# Domain Model — `Catalogo+WA`
+# Domain Model: Vitrina
 
 - **Status:** Proposed (Phase 0) — awaiting Director approval
 - Modeled from the **domain**, not from UI screens (per directive §7).

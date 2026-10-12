@@ -1,5 +1,5 @@
 # =============================================================================
-# Catalogo+WA — .gitignore
+# Vitrina: .gitignore
 # Production-quality baseline. Some sections cover tooling introduced in later
 # sprints (Next.js, tests, Docker); they are listed now so those artifacts can
 # never be committed by accident.

@@ -35,15 +35,17 @@ Dos empresas de demostración: una ferretería mayorista y una tienda de ropa, m
 
 ### Semana 1: base y lado del comprador
 
-- [ ] Lunes 12: limpieza del repo (sección "Primer día") y arranque de `prototipo/`
-- [ ] Tokens, tipografía y componentes base: botón, campo, selector, tabla que pasa a tarjetas en
-      celular, diálogo, aviso, estado vacío, insignia de estado, precio en Bs con referencia USD
-- [ ] Datos de demostración: 2 empresas, unos 40 productos con variantes, presentaciones y escalas
-- [ ] Catálogo público: portada, filtros, búsqueda, ficha de producto, barra del pedido
-- [ ] Pedido: lista, mínimo de la empresa, método de entrega, inicio de sesión simulado (Google o
+- [x] Lunes 12: limpieza del repo (sección "Primer día") y arranque de `prototipo/`
+- [x] Tokens, tipografía y componentes base: botón, campo, selector de cantidad, aviso, estado vacío,
+      insignia de estado, etiqueta de precio en Bs con referencia USD (`docs/DESIGN.md`)
+- [ ] Tabla que pasa a tarjetas en celular (la necesita el panel, semana 2)
+- [x] Datos de demostración: 2 empresas, 28 productos con variantes, presentaciones y escalas
+- [x] Catálogo público: portada, filtros, búsqueda, ficha de producto, barra del pedido
+- [x] Pedido: lista, mínimo de la empresa, método de entrega, inicio de sesión simulado (Google o
       correo), confirmación con el mensaje de WhatsApp real
-- [ ] Cuenta del comprador: Mis pedidos, detalle, Repetir pedido, direcciones, datos fiscales
-- [ ] Action de GitHub Pages; enlace funcionando en tu teléfono
+- [x] Cuenta del comprador: Mis pedidos, detalle, Repetir pedido, datos fiscales
+- [ ] Cuenta del comprador: libreta de direcciones
+- [x] Action de GitHub Pages; enlace funcionando en tu teléfono
 
 ### Semana 2: paneles y revisión
 

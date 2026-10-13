@@ -34,6 +34,7 @@ jobs:
           cache-dependency-path: prototipo/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: pnpm presupuesto
       - uses: actions/upload-pages-artifact@v3
         with:
           path: prototipo/dist

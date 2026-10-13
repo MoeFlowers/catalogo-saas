@@ -59,7 +59,7 @@ Dos empresas de demostración: una ferretería mayorista y una tienda de ropa, m
 - [ ] Sitio: portada, planes, registro de empresa con los pasos de doble factor, estado En revisión
 - [ ] Revisión contigo en celular y escritorio; lista de cambios
 - [ ] Ajustes de la revisión
-- [ ] Revisión de accesibilidad con axe y teclado
+- [x] Revisión de accesibilidad con axe y teclado: 26 pantallas sin violaciones WCAG 2.2 AA
 
 **Entregable:** enlace de GitHub Pages con el boceto completo.
 **Terminado cuando:** apruebas el diseño y los flujos. Lo que cambie aquí se anota en el plan maestro.
@@ -74,13 +74,15 @@ Dos empresas de demostración: una ferretería mayorista y una tienda de ropa, m
 - [ ] 1.2 Aplicación Next.js con TypeScript estricto, lint y formato, estructura de módulos
 - [ ] 1.3 Base de datos: Drizzle, migraciones, esquema inicial, datos de ejemplo
 - [ ] 1.4 Docker Compose: PostgreSQL, MinIO y Mailpit con un solo comando
-- [ ] 1.5 Pruebas: Vitest, Playwright y axe
+- [ ] 1.5 Pruebas: Vitest, Playwright y `@axe-core/playwright` en cada pantalla dentro del CI
+- [ ] Presupuesto de rendimiento en el CI, como ya tiene el boceto (`prototipo/scripts/presupuesto.mjs`)
 - [ ] 1.6 CI en GitHub Actions: lint, tipos, pruebas y build en cada rama
-- [ ] ADR-0005 Autoregistro, cuentas de comprador y biblioteca de autenticación (prueba corta de
+- [x] ADR-0005 Confirmación y avisos de pedidos por WhatsApp (escrito el 13 oct)
+- [ ] ADR-0006 Autoregistro, cuentas de comprador y biblioteca de autenticación (prueba corta de
       Better Auth)
-- [ ] ADR-0006 Monedas y tasas (amplía ADR-0003)
-- [ ] ADR-0007 Inventario por movimientos
-- [ ] ADR-0008 Suscripciones con pago reportado
+- [ ] ADR-0007 Monedas y tasas (amplía ADR-0003)
+- [ ] ADR-0008 Inventario por movimientos
+- [ ] ADR-0009 Suscripciones con pago reportado
 - [ ] Actualizar `DOMAIN-MODEL.md` y `DATABASE-DESIGN.md` con el plan maestro v2
 - [ ] Pasar los componentes del boceto a `src/shared/ui`
 
@@ -231,6 +233,20 @@ inventario, lector de código de barras, llaves de acceso, pasarela de pago, dom
 empresa, licencia con instalación propia.
 
 ---
+
+## Referencias de la comunidad
+
+Listas curadas de [sindresorhus/awesome](https://github.com/sindresorhus/awesome) que guían decisiones:
+
+| Lista | Para qué la usamos | Fase |
+|---|---|---|
+| [Web Accessibility](https://github.com/brunopulis/awesome-a11y) | axe-core para auditar cada pantalla | A (hecho), B en el CI |
+| [Web Performance Budget](https://github.com/pajaydev/awesome-web-performance-budget) | Límite del JavaScript y CSS inicial en el CI | A (hecho), B |
+| [Playwright](https://github.com/mxschmitt/awesome-playwright) | Pruebas de extremo a extremo de los flujos de pedido y stock | B |
+| [Application Security](https://github.com/paragonie/awesome-appsec) | Lista de verificación de autenticación y sesiones (OWASP ASVS) | C |
+| [Progressive Web Apps](https://github.com/TalAter/awesome-progressive-web-apps) | Catálogo instalable en el teléfono del comprador | I |
+| [Design systems](https://github.com/klaufel/awesome-design-systems) | Forma de documentar `docs/DESIGN.md` y los componentes | B |
+| [Mobile Web Development](https://github.com/myshov/awesome-mobile-web-development) | Revisión del uso en celulares de gama baja | I |
 
 ## Primer día: lunes 12 de octubre
 

@@ -111,6 +111,7 @@ interface EstadoDatos {
 
   crearPedido: (datos: Omit<Pedido, "id" | "numero">) => Pedido;
   asignarSemillas: (correo: string) => void;
+  marcarWhatsappAbierto: (pedidoId: string) => void;
   cambiarEstado: (pedidoId: string, destino: EstadoPedido, usuario: string) => string | null;
   ajustarCantidad: (pedidoId: string, indice: number, unidadesBase: number) => void;
   cancelarVencidos: (empresa: string) => number;
@@ -141,6 +142,11 @@ export const useDatos = create<EstadoDatos>()(
 
       asignarSemillas: (correo) =>
         set((s) => ({ pedidos: s.pedidos.map((p) => (p.semillaComprador ? { ...p, compradorCorreo: correo } : p)) })),
+
+      marcarWhatsappAbierto: (pedidoId) =>
+        set((s) => ({
+          pedidos: s.pedidos.map((p) => (p.id === pedidoId && !p.whatsappAbierto ? { ...p, whatsappAbierto: new Date().toISOString() } : p)),
+        })),
 
       cambiarEstado: (pedidoId, destino, usuario) => {
         const s = get();
@@ -315,7 +321,7 @@ export const useDatos = create<EstadoDatos>()(
     }),
     {
       name: "vitrina.datos",
-      version: 3,
+      version: 4,
       // El boceto no conserva datos de versiones anteriores: vuelve a la demostración inicial
       migrate: () => estadoInicial() as unknown as EstadoDatos,
     },

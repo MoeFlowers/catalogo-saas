@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router";
 import type { EstadoPedido } from "../../datos/tipos";
 import { SIGUIENTES, useDatos, usePedido } from "../../estado/datos";
 import { NOMBRE_ESTADO } from "../../estado/pedidos";
+import { mensajeEstado } from "../../lib/avisos";
 import { formatear, formatearFecha, formatearTasa, refUsd } from "../../lib/dinero";
 import { disponible } from "../../lib/inventario";
 import { NOMBRE_ENTREGA, numeroPedido } from "../../lib/pedido";
@@ -81,6 +82,7 @@ export function PanelPedido() {
   };
 
   const mensajeCliente = `Hola ${pedido.comprador.nombre}, te escribimos de ${empresa.nombre} por tu pedido ${numeroPedido(pedido.numero)}.`;
+  const aviso = mensajeEstado(pedido, empresa);
 
   return (
     <>
@@ -121,6 +123,21 @@ export function PanelPedido() {
         </div>
       )}
 
+      {pedido.estado === "pendiente" && (
+        <div className="mb-5 print:hidden">
+          {pedido.whatsappAbierto ? (
+            <Aviso titulo={`El cliente abrió WhatsApp con este pedido ${hace(pedido.whatsappAbierto)}`}>
+              Búscalo en tu chat para confirmar disponibilidad y costo de envío. Vitrina no puede saber si tocó Enviar.
+            </Aviso>
+          ) : (
+            <Aviso tipo="alerta" titulo="El cliente no llegó a abrir WhatsApp con este pedido">
+              Puede que el mensaje no te llegue.{" "}
+              {pedido.comprador.telefono ? "Escríbele tú para no perder la venta." : "No dejó teléfono: si no aparece, el pedido se cancela solo."}
+            </Aviso>
+          )}
+        </div>
+      )}
+
       {(siguientes.length > 0 || puedeCancelar) && (
         <section aria-label="Acciones del pedido" className="mb-6 rounded-tarjeta border border-linea bg-superficie p-4 print:hidden">
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -142,6 +159,28 @@ export function PanelPedido() {
             </div>
           )}
           {hecho && !error && <p role="status" className="mt-3 text-sm font-semibold text-exito">{hecho}</p>}
+        </section>
+      )}
+
+      {aviso && pedido.estado !== "pendiente" && (
+        <section aria-labelledby="titulo-aviso" className="mb-6 rounded-tarjeta border border-linea bg-superficie p-4 print:hidden">
+          <h2 id="titulo-aviso" className="font-bold">
+            Avisa al cliente: {NOMBRE_ESTADO[pedido.estado].toLowerCase()}
+          </h2>
+          <p className="mt-1 whitespace-pre-line text-sm text-tenue">{aviso}</p>
+          {pedido.comprador.telefono ? (
+            <a
+              href={`https://wa.me/${telefonoWa(pedido.comprador.telefono)}?text=${encodeURIComponent(aviso)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={clasesBoton("secundario", "mt-3")}
+            >
+              <IconoWhatsApp />
+              Enviar aviso por WhatsApp
+            </a>
+          ) : (
+            <p className="mt-2 text-sm">El cliente no dejó teléfono: ve el estado nuevo en su cuenta de Vitrina.</p>
+          )}
         </section>
       )}
 

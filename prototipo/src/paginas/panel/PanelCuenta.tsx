@@ -220,7 +220,8 @@ export function PanelSuscripcion() {
         <h2 id="titulo-planes" className="text-lg font-bold">
           Planes
         </h2>
-        <div className="mt-2 overflow-x-auto rounded-tarjeta border border-linea bg-superficie">
+        {/* Se desplaza de lado en el celular: enfocable para recorrerla con el teclado */}
+        <div tabIndex={0} role="region" aria-label="Comparación de planes, desplazable" className="mt-2 overflow-x-auto rounded-tarjeta border border-linea bg-superficie">
           <table className="w-full min-w-[34rem] text-sm">
             <caption className="sr-only">Comparación de planes</caption>
             <thead>

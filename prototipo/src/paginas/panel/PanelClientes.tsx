@@ -181,9 +181,8 @@ export function PanelCategorias() {
                       setHecho(`Eliminaste la categoría ${c.nombre}.`);
                     }}
                     className="min-h-11 px-2 text-sm font-semibold text-peligro underline underline-offset-2 disabled:no-underline disabled:opacity-40"
-                    aria-label={n > 0 ? `${c.nombre} tiene productos: muévelos antes de eliminarla` : `Eliminar ${c.nombre}`}
                   >
-                    Eliminar
+                    Eliminar<span className="sr-only"> {c.nombre}</span>
                   </button>
                 </span>
               </li>

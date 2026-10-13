@@ -165,6 +165,11 @@ export interface Pedido {
   semillaComprador?: boolean;
   /** La empresa cambió cantidades antes de confirmar */
   ajustado?: boolean;
+  /**
+   * Cuándo el comprador abrió WhatsApp con el mensaje del pedido. Es una señal, no una prueba de envío:
+   * wa.me no avisa si tocó Enviar (ver ADR-0005). En la app real la registra el enlace de redirección.
+   */
+  whatsappAbierto?: string;
 }
 
 export type TipoMovimiento = "entrada" | "salida" | "ajuste" | "reserva" | "liberacion";

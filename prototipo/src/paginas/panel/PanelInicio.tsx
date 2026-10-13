@@ -102,6 +102,7 @@ export function PanelInicio() {
                       <span className="cifras text-right font-semibold">{formatear(p.totalBsCent, "VES")}</span>
                       <span className="text-sm text-tenue">
                         {hace(p.fecha)}, {p.items.length} {p.items.length === 1 ? "producto" : "productos"}
+                        {p.whatsappAbierto ? ", abrió WhatsApp" : <span className="font-semibold text-alerta">, no abrió WhatsApp</span>}
                       </span>
                       <span className="text-right">
                         <Estado estado={p.estado} />

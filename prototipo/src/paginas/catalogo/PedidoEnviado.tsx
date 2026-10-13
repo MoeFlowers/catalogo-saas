@@ -1,7 +1,7 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router";
-import { usePedido } from "../../estado/datos";
+import { useDatos, usePedido } from "../../estado/datos";
 import { mensajeWhatsApp, numeroPedido } from "../../lib/pedido";
 import { Boton, BotonEnlace, clasesBoton } from "../../ui/Boton";
 import { Aviso } from "../../ui/piezas";
@@ -25,6 +25,7 @@ export function PedidoEnviado() {
   const empresa = useEmpresa();
   const { pedidoId } = useParams();
   const pedido = usePedido(pedidoId);
+  const marcarAbierto = useDatos((s) => s.marcarWhatsappAbierto);
   const [copiado, setCopiado] = useState<"si" | "error" | null>(null);
 
   if (!pedido || pedido.empresa !== empresa.slug) return <NoEncontrado />;
@@ -37,6 +38,7 @@ export function PedidoEnviado() {
     try {
       await navigator.clipboard.writeText(mensaje);
       setCopiado("si");
+      marcarAbierto(pedido.id);
     } catch {
       setCopiado("error");
     }
@@ -51,7 +53,7 @@ export function PedidoEnviado() {
       </p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-        <a href={enlaceWa} target="_blank" rel="noopener noreferrer" className={clasesBoton("marca", "sm:px-6")}>
+        <a href={enlaceWa} target="_blank" rel="noopener noreferrer" onClick={() => marcarAbierto(pedido.id)} className={clasesBoton("marca", "sm:px-6")}>
           <IconoWhatsApp />
           Abrir WhatsApp
         </a>

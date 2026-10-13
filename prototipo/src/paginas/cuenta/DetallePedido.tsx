@@ -20,6 +20,7 @@ export function DetallePedido() {
   const pedido = usePedido(id);
   const correo = useSesion((s) => s.comprador?.correo);
   const productos = useDatos((s) => s.productos);
+  const marcarAbierto = useDatos((s) => s.marcarWhatsappAbierto);
   const reemplazar = useCarrito((s) => s.reemplazar);
   const empresa = useEmpresaPorSlug(pedido?.empresa);
   if (!pedido || !empresa || pedido.compradorCorreo !== correo) return <NoEncontrado />;
@@ -68,6 +69,7 @@ export function DetallePedido() {
             href={`https://wa.me/?text=${encodeURIComponent(mensajeWhatsApp(pedido, empresa, enlacePedido(pedido.id)))}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => marcarAbierto(pedido.id)}
             className={clasesBoton("secundario")}
           >
             <IconoWhatsApp />

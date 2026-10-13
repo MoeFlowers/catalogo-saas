@@ -181,7 +181,9 @@ Cliente: Ana Pérez, V-12.345.678
 Ver pedido: vitrina.app/p/7Kq2...
 ```
 
-Las cifras de arriba son de ejemplo. Este método no usa la API de WhatsApp Business y cuesta $0. Su
+Las cifras de arriba son de ejemplo. Este método no usa la API de WhatsApp Business y cuesta $0. Para
+compensar lo que no sabe, el pedido guarda cuándo el comprador abrió WhatsApp con el mensaje y el panel
+ofrece avisarle al cliente cada cambio de estado con un toque (ADR-0005). Su
 límite es que la plataforma no sabe si el comprador tocó Enviar; por eso el pedido nace Pendiente y la
 empresa lo confirma.
 
@@ -295,7 +297,7 @@ Reglas:
 - Auditoría de acciones sensibles.
 
 Biblioteca propuesta: Better Auth (correo y contraseña, Google, doble factor, organizaciones y roles,
-límite de intentos, adaptador de Drizzle). Se confirma en ADR-0005 tras una prueba corta; si no cumple,
+límite de intentos, adaptador de Drizzle). Se confirma en ADR-0006 tras una prueba corta; si no cumple,
 se arma con Arctic y Oslo, que es lo que ya decía ADR-0001.
 
 ## 8. Diseño
@@ -446,7 +448,7 @@ entonces se prueban con Mailpit.
 | Riesgo | Mitigación |
 |---|---|
 | Pedir cuenta al comprador reduce pedidos | Se pide solo al final, con Google en un toque, sin perder el carrito |
-| Pedidos que nunca se envían por WhatsApp | Nacen Pendientes y no reservan stock; se cancelan solos |
+| Pedidos que nunca se envían por WhatsApp | Nacen Pendientes y no reservan stock; el panel marca los que no llegaron a abrir WhatsApp; se cancelan solos (ADR-0005) |
 | Fuente de tasas caída o con error | Última tasa válida, aviso en el admin, tasa manual |
 | Estafas | Aprobación manual, denuncias, suspensión, auditoría |
 | El inventario detallado alarga el proyecto | Se entrega por capas: stock simple, luego variantes y presentaciones, luego almacenes |

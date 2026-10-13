@@ -164,6 +164,8 @@ export function Portada() {
             </EstadoVacio>
           </div>
         ) : (
+          <>
+          <h2 className="sr-only">Productos</h2>
           <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {visibles.map((p) => (
               <li key={p.id} className="flex">
@@ -171,6 +173,7 @@ export function Portada() {
               </li>
             ))}
           </ul>
+          </>
         )}
       </div>
       <BarraPedido empresa={empresa} />

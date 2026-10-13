@@ -9,7 +9,7 @@ import { Area, Campo } from "../../ui/Campo";
 import { Aviso } from "../../ui/piezas";
 import { Casilla } from "../../ui/Selector";
 import { aCentimos, deCentimos, Encabezado, enteroPositivo } from "./comun";
-import { usePanel } from "./PanelLayout";
+import { SinPermiso, usePanel } from "./PanelLayout";
 
 const TIPOS: { tipo: TipoEntrega; ayuda: string; pideDireccion: boolean }[] = [
   { tipo: "retiro", ayuda: "Dirección y horario donde se retira.", pideDireccion: false },
@@ -37,7 +37,7 @@ function Errores({ errores }: { errores: { id: string; texto: string }[] }) {
 }
 
 export function PanelEntrega() {
-  const { empresa } = usePanel();
+  const { empresa, puede } = usePanel();
   const actualizar = useDatos((s) => s.actualizarEmpresa);
   const [metodos, setMetodos] = useState(() =>
     TIPOS.map((t) => {
@@ -90,9 +90,13 @@ export function PanelEntrega() {
           </div>
         ))}
         <div className="flex flex-wrap items-center gap-3">
-          <Boton type="submit" variante="accion">
-            Guardar entrega
-          </Boton>
+          {puede("ajustes") ? (
+            <Boton type="submit" variante="accion">
+              Guardar entrega
+            </Boton>
+          ) : (
+            <SinPermiso que="cambiar la entrega" />
+          )}
           {hecho && (
             <p role="status" className="text-sm font-semibold text-exito">
               Guardado. Ya se ve en tu catálogo.
@@ -109,7 +113,7 @@ const HEX = /^#[0-9a-f]{6}$/i;
 const WHATSAPP = /^\+\d{8,15}$/;
 
 export function PanelCatalogo() {
-  const { empresa } = usePanel();
+  const { empresa, puede } = usePanel();
   const actualizar = useDatos((s) => s.actualizarEmpresa);
   const [f, setF] = useState({
     nombre: empresa.nombre,
@@ -178,9 +182,19 @@ export function PanelCatalogo() {
         <p className="mt-1 text-sm text-tenue">
           {empresa.publicado ? "Cualquiera con el enlace puede verlo y pedir." : "Quien abra el enlace ve un aviso de que el catálogo no está disponible. Tus datos no se borran."}
         </p>
-        <Boton className="mt-3" variante={empresa.publicado ? "peligro" : "accion"} onClick={() => actualizar(empresa.slug, { publicado: !empresa.publicado })}>
-          {empresa.publicado ? "Pausar catálogo" : "Publicar catálogo"}
-        </Boton>
+        {empresa.estado !== "activa" ? (
+          <p className="mt-3 text-sm font-semibold">
+            {empresa.estado === "en-revision" ? "Podrás publicarlo cuando Vitrina apruebe tu empresa." : "No se puede publicar mientras la empresa no esté activa."}
+          </p>
+        ) : puede("ajustes") ? (
+          <Boton className="mt-3" variante={empresa.publicado ? "peligro" : "accion"} onClick={() => actualizar(empresa.slug, { publicado: !empresa.publicado })}>
+            {empresa.publicado ? "Pausar catálogo" : "Publicar catálogo"}
+          </Boton>
+        ) : (
+          <div className="mt-3">
+            <SinPermiso que="publicar ni pausar el catálogo" />
+          </div>
+        )}
       </section>
 
       <form onSubmit={guardar} noValidate className="max-w-2xl space-y-6">
@@ -271,9 +285,13 @@ export function PanelCatalogo() {
         </fieldset>
 
         <div className="flex flex-wrap items-center gap-3 border-t border-linea pt-6">
-          <Boton type="submit" variante="accion">
-            Guardar catálogo
-          </Boton>
+          {puede("ajustes") ? (
+            <Boton type="submit" variante="accion">
+              Guardar catálogo
+            </Boton>
+          ) : (
+            <SinPermiso que="cambiar el catálogo" />
+          )}
           {hecho && (
             <p role="status" className="text-sm font-semibold text-exito">
               Guardado. Ya se ve en tu catálogo.

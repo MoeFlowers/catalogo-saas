@@ -98,7 +98,8 @@ const slug = (t: string) =>
     .replace(/^-|-$/g, "");
 
 export function PanelCategorias() {
-  const { empresa } = usePanel();
+  const { empresa, puede } = usePanel();
+  const editable = puede("ajustes");
   const productos = useProductosDe(empresa.slug);
   const actualizar = useDatos((s) => s.actualizarEmpresa);
   const [edicion, setEdicion] = useState<{ id: string | null; nombre: string; error?: string } | null>(null);
@@ -135,10 +136,12 @@ export function PanelCategorias() {
       <Encabezado
         titulo="Categorías"
         acciones={
-          <Boton variante="accion" onClick={() => setEdicion({ id: null, nombre: "" })}>
-            <Plus size={18} aria-hidden />
-            Nueva categoría
-          </Boton>
+          editable ? (
+            <Boton variante="accion" onClick={() => setEdicion({ id: null, nombre: "" })}>
+              <Plus size={18} aria-hidden />
+              Nueva categoría
+            </Boton>
+          ) : undefined
         }
       >
         El orden de esta lista es el orden de las categorías en tu catálogo.
@@ -163,6 +166,7 @@ export function PanelCategorias() {
                     {n} {n === 1 ? "producto" : "productos"}
                   </span>
                 </span>
+                {editable && (
                 <span className="flex items-center">
                   <button type="button" disabled={i === 0} onClick={() => mover(i, -1)} aria-label={`Subir ${c.nombre}`} className="grid size-11 place-items-center rounded-control hover:bg-hundido disabled:opacity-30">
                     <ArrowUp size={18} aria-hidden />
@@ -185,6 +189,7 @@ export function PanelCategorias() {
                     Eliminar<span className="sr-only"> {c.nombre}</span>
                   </button>
                 </span>
+                )}
               </li>
             );
           })}

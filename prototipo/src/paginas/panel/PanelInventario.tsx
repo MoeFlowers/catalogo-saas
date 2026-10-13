@@ -41,7 +41,7 @@ interface FormMov {
 }
 
 export function PanelInventario() {
-  const { empresa, sesion } = usePanel();
+  const { empresa, sesion, puede } = usePanel();
   const productos = useProductosDe(empresa.slug);
   const movimientos = useDatos(useShallow((s) => s.movimientos.filter((m) => m.empresa === empresa.slug)));
   const registrar = useDatos((s) => s.registrarMovimiento);
@@ -186,7 +186,10 @@ export function PanelInventario() {
               {
                 titulo: "Acción",
                 derecha: true,
-                celda: (f) => (
+                celda: (f) =>
+                  !puede("inventario") ? (
+                    <span className="text-tenue">Solo lectura</span>
+                  ) : (
                   <button
                     type="button"
                     onClick={() => {

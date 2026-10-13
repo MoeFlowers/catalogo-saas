@@ -15,7 +15,7 @@ import { Aviso } from "../../ui/piezas";
 import { IconoWhatsApp } from "../catalogo/PedidoEnviado";
 import { NoEncontrado } from "../NoEncontrado";
 import { Encabezado, Estado, hace } from "./comun";
-import { usePanel } from "./PanelLayout";
+import { SinPermiso, usePanel } from "./PanelLayout";
 
 const ACCION: Partial<Record<EstadoPedido, string>> = {
   confirmado: "Confirmar y apartar mercancía",
@@ -39,7 +39,7 @@ export function telefonoWa(t: string): string {
 }
 
 export function PanelPedido() {
-  const { empresa, sesion } = usePanel();
+  const { empresa, sesion, puede } = usePanel();
   const { id } = useParams();
   const pedido = usePedido(id);
   const productos = useDatos((s) => s.productos);
@@ -55,9 +55,14 @@ export function PanelPedido() {
   const usuario = sesion.nombre || sesion.correo;
   // Despachar o listo según la entrega: solo el que corresponde
   const siguientes = SIGUIENTES[pedido.estado].filter(
-    (e) => e !== "cancelado" && !(e === "listo" && pedido.entrega !== "retiro") && !(e === "despachado" && pedido.entrega === "retiro"),
+    (e) =>
+      e !== "cancelado" &&
+      !(e === "listo" && pedido.entrega !== "retiro") &&
+      !(e === "despachado" && pedido.entrega === "retiro") &&
+      puede(e === "confirmado" ? "confirmar" : "despachar"),
   );
-  const puedeCancelar = SIGUIENTES[pedido.estado].includes("cancelado");
+  const puedeCancelar = SIGUIENTES[pedido.estado].includes("cancelado") && puede("confirmar");
+  const hayPasos = SIGUIENTES[pedido.estado].length > 0;
   const tasas = { bcv: pedido.tasa, usdt: pedido.tasa, eur: null, fecha: pedido.fechaTasa, origen: "en-vivo" as const };
 
   const avanzar = (destino: EstadoPedido) => {
@@ -161,6 +166,11 @@ export function PanelPedido() {
           {hecho && !error && <p role="status" className="mt-3 text-sm font-semibold text-exito">{hecho}</p>}
         </section>
       )}
+      {hayPasos && siguientes.length === 0 && !puedeCancelar && (
+        <div className="mb-6 print:hidden">
+          <SinPermiso que="cambiar el estado de este pedido" />
+        </div>
+      )}
 
       {aviso && pedido.estado !== "pendiente" && (
         <section aria-labelledby="titulo-aviso" className="mb-6 rounded-tarjeta border border-linea bg-superficie p-4 print:hidden">
@@ -184,7 +194,7 @@ export function PanelPedido() {
         </section>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <section aria-labelledby="titulo-productos">
           <h2 id="titulo-productos" className="text-lg font-bold">
             Productos
@@ -196,7 +206,7 @@ export function PanelPedido() {
               const disp = p ? disponible(p, it.varianteId) : 0;
               const falta = pedido.estado === "pendiente" && p && !p.bajoPedido && disp < it.unidadesBase;
               return (
-                <li key={`${it.productoId}-${it.varianteId}-${it.presentacionId}`} className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 py-3">
+                <li key={`${it.productoId}-${it.varianteId}-${it.presentacionId}`} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-1 py-3">
                   <p className="font-semibold leading-snug">
                     <span className="cifras">{it.cantidad} x </span>
                     {it.nombre}
@@ -205,7 +215,7 @@ export function PanelPedido() {
                   <p className="cifras text-sm text-tenue">
                     {it.detalle}. {it.unidadesBase.toLocaleString("es-VE")} unidades. Código {it.sku}
                   </p>
-                  {pedido.estado === "pendiente" && (
+                  {pedido.estado === "pendiente" && puede("confirmar") && (
                     <p className="text-right print:hidden">
                       <button
                         type="button"

@@ -15,11 +15,19 @@ import { MisPedidos } from "./paginas/cuenta/MisPedidos";
 import { DetallePedido } from "./paginas/cuenta/DetallePedido";
 import { MisDatos } from "./paginas/cuenta/MisDatos";
 import { NoEncontrado } from "./paginas/NoEncontrado";
+import { Denunciar } from "./paginas/catalogo/Denunciar";
 
 // El panel se descarga aparte: quien solo compra no carga el código de la empresa
 const panel = (archivo: string, componente: string) => async () => {
   const modulos = import.meta.glob("./paginas/panel/*.tsx");
   const m = (await modulos[`./paginas/panel/${archivo}.tsx`]!()) as Record<string, ComponentType>;
+  return { Component: m[componente] };
+};
+
+// El sitio de Vitrina y la administración también se descargan aparte
+const perezoso = (carpeta: "sitio" | "admin", archivo: string, componente: string) => async () => {
+  const modulos = { sitio: import.meta.glob("./paginas/sitio/*.tsx"), admin: import.meta.glob("./paginas/admin/*.tsx") }[carpeta];
+  const m = (await modulos[`./paginas/${carpeta}/${archivo}.tsx`]!()) as Record<string, ComponentType>;
   return { Component: m[componente] };
 };
 
@@ -29,7 +37,28 @@ const router = createHashRouter([
     element: <Raiz />,
     errorElement: <NoEncontrado />,
     children: [
-      { path: "/", element: <Recorrido /> },
+      { path: "/", lazy: perezoso("sitio", "Portada", "PortadaSitio") },
+      { path: "/recorrido", element: <Recorrido /> },
+      { path: "/registro", lazy: perezoso("sitio", "Registro", "Registro") },
+      { path: "/terminos", lazy: perezoso("sitio", "Legales", "Terminos") },
+      { path: "/privacidad", lazy: perezoso("sitio", "Legales", "Privacidad") },
+      { path: "/admin/entrar", lazy: perezoso("admin", "AdminLayout", "AdminEntrar") },
+      {
+        path: "/admin",
+        lazy: perezoso("admin", "AdminLayout", "AdminLayout"),
+        children: [
+          { index: true, lazy: perezoso("admin", "AdminOperacion", "AdminResumen") },
+          { path: "solicitudes", lazy: perezoso("admin", "AdminOperacion", "AdminSolicitudes") },
+          { path: "empresas", lazy: perezoso("admin", "AdminOperacion", "AdminEmpresas") },
+          { path: "empresas/:slug", lazy: perezoso("admin", "AdminOperacion", "AdminEmpresa") },
+          { path: "pagos", lazy: perezoso("admin", "AdminOperacion", "AdminPagos") },
+          { path: "tasas", lazy: perezoso("admin", "AdminControl", "AdminTasas") },
+          { path: "denuncias", lazy: perezoso("admin", "AdminControl", "AdminDenuncias") },
+          { path: "compradores", lazy: perezoso("admin", "AdminControl", "AdminCompradores") },
+          { path: "planes", lazy: perezoso("admin", "AdminControl", "AdminPlanes") },
+          { path: "auditoria", lazy: perezoso("admin", "AdminControl", "AdminAuditoria") },
+        ],
+      },
       {
         path: "/c/:slug",
         element: <CatalogoLayout />,
@@ -38,6 +67,7 @@ const router = createHashRouter([
           { path: "p/:id", element: <FichaProducto /> },
           { path: "pedido", element: <MiPedido /> },
           { path: "pedido/enviado/:pedidoId", element: <PedidoEnviado /> },
+          { path: "denunciar", element: <Denunciar /> },
         ],
       },
       { path: "/entrar", element: <Entrar /> },

@@ -10,10 +10,7 @@ const QUE_PROBAR: Record<string, string> = {
   "textiles-ejemplo": "Tallas con existencia por talla, docenas, telas por metro y pedido mínimo más alto.",
 };
 
-const SIGUE = [
-  "Panel de la plataforma: solicitudes de empresas, pagos y tasas",
-  "Sitio de Vitrina y registro de empresas con doble factor",
-];
+
 
 export function Recorrido() {
   const EMPRESAS = useDatos((s) => s.empresas);
@@ -44,7 +41,9 @@ export function Recorrido() {
 
   return (
     <main id="contenido" tabIndex={-1} className="mx-auto max-w-3xl px-4 py-10 outline-none">
-      <p className="text-lg font-bold">Vitrina</p>
+      <Link to="/" className="text-lg font-bold">
+        Vitrina
+      </Link>
       <h1 className="mt-6 text-3xl font-bold leading-tight sm:text-4xl">Catálogos con pedidos por WhatsApp</h1>
       <p className="mt-3 max-w-2xl text-lg text-tenue">
         Este boceto sirve para probar el diseño y los flujos antes de construir la aplicación. Todo funciona en tu navegador con datos de
@@ -112,15 +111,30 @@ export function Recorrido() {
         <p className="mt-2 text-sm text-tenue">Los pedidos que hagas como cliente le llegan al panel de esa empresa.</p>
       </section>
 
-      <section aria-labelledby="titulo-sigue" className="mt-10">
-        <h2 id="titulo-sigue" className="text-xl font-bold">
-          En construcción esta semana
+      <section aria-labelledby="titulo-plataforma" className="mt-10">
+        <h2 id="titulo-plataforma" className="text-xl font-bold">
+          Registra una empresa y apruébala
         </h2>
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-tenue">
-          {SIGUE.map((s) => (
-            <li key={s}>{s}</li>
+        <ul className="mt-3 divide-y divide-linea border-y border-linea">
+          {(
+            [
+              ["/", "Sitio de Vitrina", "La portada que ve una empresa interesada: cómo funciona, planes y preguntas."],
+              ["/registro", "Registro de empresa", "Cuenta, verificación del correo, doble factor con códigos de recuperación, datos de la empresa y enlace. Queda en revisión."],
+              ["/admin", "Administración de la plataforma", "Aprueba o rechaza solicitudes, valida pagos, fija tasas, atiende denuncias, bloquea compradores y entra en modo soporte."],
+            ] as const
+          ).map(([ruta, titulo, texto]) => (
+            <li key={ruta}>
+              <Link to={ruta} className="flex items-center gap-4 rounded-control py-4 hover:bg-hundido sm:px-2">
+                <span className="min-w-0 flex-1">
+                  <span className="block font-semibold">{titulo}</span>
+                  <span className="block text-sm text-tenue">{texto}</span>
+                </span>
+                <ChevronRight size={18} className="shrink-0 text-tenue" aria-hidden />
+              </Link>
+            </li>
           ))}
         </ul>
+        <p className="mt-2 text-sm text-tenue">Una empresa que registres aparece en Solicitudes; al aprobarla puede publicar su catálogo.</p>
       </section>
 
       <section aria-labelledby="titulo-reinicio" className="mt-10 border-t border-linea pt-6">

@@ -21,11 +21,20 @@ import { NOMBRE_ROL } from "../../datos/planes";
 import type { Empresa } from "../../datos/tipos";
 import { useDatos, useEmpresaPorSlug } from "../../estado/datos";
 import { useSesion, type SesionPanel } from "../../estado/sesion";
+import { formatearFecha } from "../../lib/dinero";
+import { puede as puedeRol, suscripcionVencida, type Area } from "../../lib/permisos";
 import { Aviso } from "../../ui/piezas";
 
 export interface ContextoPanel {
   empresa: Empresa;
   sesion: SesionPanel;
+  /** Si el rol, el estado de la empresa y el modo soporte permiten cambiar esa área */
+  puede: (area: Area) => boolean;
+}
+
+/** Aviso para las pantallas o acciones que el rol no puede usar */
+export function SinPermiso({ que }: { que: string }) {
+  return <p className="text-sm text-tenue">Tu acceso no permite {que}. Pídeselo al dueño de la empresa.</p>;
 }
 
 export function usePanel(): ContextoPanel {
@@ -132,6 +141,45 @@ export function PanelLayout() {
         </header>
 
         <main id="contenido" tabIndex={-1} className="mx-auto max-w-6xl px-4 pb-28 pt-6 outline-none lg:px-8 lg:pb-12">
+          {sesion.soporte && (
+            <div className="mb-5">
+              <Aviso tipo="alerta" titulo="Modo soporte de Vitrina">
+                Ves el panel de {empresa.nombre} en solo lectura. Esta visita quedó en la auditoría.
+              </Aviso>
+            </div>
+          )}
+          {empresa.estado === "en-revision" && (
+            <div className="mb-5">
+              <Aviso titulo="Tu empresa está en revisión">
+                Ya puedes cargar productos, categorías y entrega. El catálogo se publica cuando Vitrina apruebe tu solicitud; te avisamos por correo.
+              </Aviso>
+            </div>
+          )}
+          {empresa.estado === "rechazada" && (
+            <div className="mb-5">
+              <Aviso tipo="error" titulo="Tu solicitud no fue aprobada">
+                Motivo: {empresa.motivoEstado}. Si crees que es un error, responde el correo de Vitrina con los datos que faltan.
+              </Aviso>
+            </div>
+          )}
+          {empresa.estado === "suspendida" && (
+            <div className="mb-5">
+              <Aviso tipo="error" titulo="Tu empresa está suspendida">
+                Motivo: {empresa.motivoEstado}. El catálogo no se ve y el panel queda en solo lectura hasta que Vitrina lo reactive.
+              </Aviso>
+            </div>
+          )}
+          {empresa.estado === "activa" && suscripcionVencida(empresa) && (
+            <div className="mb-5">
+              <Aviso tipo="error" titulo={`Tu suscripción venció el ${formatearFecha(empresa.vence)}`}>
+                El catálogo se ve pero no recibe pedidos.{" "}
+                <Link to="/panel/suscripcion" className="font-semibold underline underline-offset-2">
+                  Reporta tu pago
+                </Link>{" "}
+                para reactivarlo.
+              </Aviso>
+            </div>
+          )}
           {cancelados > 0 && (
             <div className="mb-5">
               <Aviso tipo="alerta" titulo={`Se cancelaron ${cancelados} ${cancelados === 1 ? "pedido pendiente" : "pedidos pendientes"}`}>
@@ -139,7 +187,7 @@ export function PanelLayout() {
               </Aviso>
             </div>
           )}
-          <Outlet context={{ empresa, sesion } satisfies ContextoPanel} />
+          <Outlet context={{ empresa, sesion, puede: (a: Area) => puedeRol(sesion.rol, a, empresa, sesion.soporte) } satisfies ContextoPanel} />
         </main>
       </div>
 

@@ -18,7 +18,7 @@ const normalizar = (s: string) =>
     .toLowerCase();
 
 export function PanelProductos() {
-  const { empresa } = usePanel();
+  const { empresa, puede } = usePanel();
   const productos = useProductosDe(empresa.slug);
   const [params, setParams] = useSearchParams();
   const { state } = useLocation() as { state: { guardado?: string } | null };
@@ -47,7 +47,7 @@ export function PanelProductos() {
       <Encabezado
         titulo="Productos"
         acciones={
-          lleno ? undefined : (
+          lleno || !puede("productos") ? undefined : (
             <BotonEnlace to="/panel/productos/nuevo" variante="accion">
               <Plus size={18} aria-hidden />
               Nuevo producto

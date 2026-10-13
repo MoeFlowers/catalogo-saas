@@ -12,13 +12,13 @@ import { Dialogo } from "../../ui/Dialogo";
 import { Aviso } from "../../ui/piezas";
 import { Selector } from "../../ui/Selector";
 import { aCentimos, Encabezado } from "./comun";
-import { usePanel } from "./PanelLayout";
+import { SinPermiso, usePanel } from "./PanelLayout";
 
 const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const ROLES_INVITABLES: Rol[] = ["administrador", "vendedor", "almacen", "lectura"];
 
 export function PanelEquipo() {
-  const { empresa, sesion } = usePanel();
+  const { empresa, puede } = usePanel();
   const { invitar, cambiarRol, quitarMiembro } = useDatos(useShallow((s) => ({ invitar: s.invitar, cambiarRol: s.cambiarRol, quitarMiembro: s.quitarMiembro })));
   const [correo, setCorreo] = useState("");
   const [rol, setRol] = useState<Rol>("vendedor");
@@ -26,7 +26,7 @@ export function PanelEquipo() {
   const [hecho, setHecho] = useState<string | null>(null);
   const [quitar, setQuitar] = useState<string | null>(null);
   const plan = planDe(empresa.plan);
-  const puedeGestionar = sesion.rol === "dueno" || sesion.rol === "administrador";
+  const puedeGestionar = puede("equipo");
 
   const enviar = (e: FormEvent) => {
     e.preventDefault();
@@ -153,7 +153,7 @@ const METODOS: { valor: Pago["metodo"]; texto: string; moneda: Pago["moneda"] }[
 const ESTADO_PAGO: Record<Pago["estado"], string> = { "en-revision": "En revisión", validado: "Validado", rechazado: "Rechazado" };
 
 export function PanelSuscripcion() {
-  const { empresa } = usePanel();
+  const { empresa, puede } = usePanel();
   const productos = useProductosDe(empresa.slug);
   const pagos = useDatos(useShallow((s) => s.pagos.filter((p) => p.empresa === empresa.slug)));
   const reportarPago = useDatos((s) => s.reportarPago);
@@ -162,13 +162,15 @@ export function PanelSuscripcion() {
   const dias = Math.ceil((new Date(empresa.vence).getTime() - Date.now()) / 86_400_000);
 
   const [metodo, setMetodo] = useState<Pago["metodo"]>("pago-movil");
+  const [planPago, setPlanPago] = useState(empresa.plan);
   const [referencia, setReferencia] = useState("");
   const [monto, setMonto] = useState("");
   const [comprobante, setComprobante] = useState<string | null>(null);
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [hecho, setHecho] = useState(false);
   const moneda = METODOS.find((m) => m.valor === metodo)!.moneda;
-  const montoBs = tasas ? aBs(plan.precioUsdCent, "USD", tasas) : null;
+  const elegido = planDe(planPago);
+  const montoBs = tasas ? aBs(elegido.precioUsdCent, "USD", tasas) : null;
 
   const enviar = (e: FormEvent) => {
     e.preventDefault();
@@ -181,7 +183,7 @@ export function PanelSuscripcion() {
     setHecho(false);
     const primero = Object.keys(err)[0];
     if (primero) return document.getElementById(primero)?.focus();
-    reportarPago({ empresa: empresa.slug, metodo, referencia: referencia.trim(), montoCent: cent!, moneda });
+    reportarPago({ empresa: empresa.slug, metodo, referencia: referencia.trim(), montoCent: cent!, moneda, plan: planPago, comprobante: comprobante! });
     setReferencia("");
     setMonto("");
     setComprobante(null);
@@ -262,9 +264,22 @@ export function PanelSuscripcion() {
         <p className="mt-2 text-sm text-tenue">Para cambiar de plan, reporta el pago del plan nuevo y lo activamos al validarlo. Usuario extra: USD 3 al mes en Negocio y Mayorista.</p>
       </section>
 
+      {!puede("suscripcion") ? (
+        <div className="mt-8 max-w-3xl">
+          <SinPermiso que="reportar pagos" />
+        </div>
+      ) : (
       <form onSubmit={enviar} noValidate className="mt-8 max-w-3xl space-y-4 rounded-tarjeta border border-linea bg-superficie p-4">
         <h2 className="text-lg font-bold">Reportar un pago</h2>
         <p className="text-sm text-tenue">Vitrina valida el pago a mano y extiende tu suscripción. Recibes un correo cuando se valide.</p>
+        <Selector
+          id="pago-plan"
+          etiqueta="Plan que pagas"
+          value={planPago}
+          onChange={(e) => setPlanPago(e.target.value as typeof planPago)}
+          ayuda={planPago === empresa.plan ? "Renueva tu plan actual por 30 días." : `Al validar el pago tu empresa pasa al plan ${elegido.nombre}.`}
+          opciones={PLANES.map((p) => ({ valor: p.id, texto: `${p.nombre}, USD ${p.precioUsdCent / 100} al mes` }))}
+        />
         <Selector id="pago-metodo" etiqueta="Método" value={metodo} onChange={(e) => setMetodo(e.target.value as Pago["metodo"])} opciones={METODOS.map((m) => ({ valor: m.valor, texto: m.texto }))} />
         <div className="grid gap-4 sm:grid-cols-2">
           <Campo id="pago-ref" etiqueta="Referencia" value={referencia} onChange={(e) => setReferencia(e.target.value)} error={errores["pago-ref"]} />
@@ -275,7 +290,7 @@ export function PanelSuscripcion() {
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
             error={errores["pago-monto"]}
-            ayuda={moneda === "VES" && montoBs != null ? `El plan ${plan.nombre} hoy: ${formatear(montoBs, "VES")}` : `El plan ${plan.nombre}: USD ${plan.precioUsdCent / 100}`}
+            ayuda={moneda === "VES" && montoBs != null ? `El plan ${elegido.nombre} hoy: ${formatear(montoBs, "VES")}` : `El plan ${elegido.nombre}: USD ${elegido.precioUsdCent / 100}`}
           />
         </div>
         <div className="space-y-1.5">
@@ -309,6 +324,7 @@ export function PanelSuscripcion() {
           </p>
         )}
       </form>
+      )}
 
       <section aria-labelledby="titulo-pagos" className="mt-8 max-w-3xl">
         <h2 id="titulo-pagos" className="text-lg font-bold">
@@ -325,8 +341,9 @@ export function PanelSuscripcion() {
                     {METODOS.find((m) => m.valor === p.metodo)?.texto}, ref. {p.referencia}
                   </span>
                   <span className="cifras block text-tenue">
-                    {formatearFecha(p.fecha, true)}, {formatear(p.montoCent, p.moneda)}
+                    {formatearFecha(p.fecha, true)}, {formatear(p.montoCent, p.moneda)}, plan {planDe(p.plan).nombre}
                   </span>
+                  {p.motivo && <span className="block text-peligro">Motivo: {p.motivo}</span>}
                 </span>
                 <span className={`font-semibold ${p.estado === "validado" ? "text-exito" : p.estado === "rechazado" ? "text-peligro" : "text-alerta"}`}>{ESTADO_PAGO[p.estado]}</span>
               </li>

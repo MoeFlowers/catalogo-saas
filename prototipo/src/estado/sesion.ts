@@ -8,11 +8,21 @@ export interface SesionPanel {
   nombre: string;
   rol: Rol;
   desde: string;
+  /** Entró alguien de Vitrina a dar soporte: todo en solo lectura y queda en la auditoría */
+  soporte?: boolean;
+}
+
+export interface SesionAdmin {
+  correo: string;
+  desde: string;
 }
 
 interface EstadoSesion {
   comprador: Comprador | null;
   panel: SesionPanel | null;
+  admin: SesionAdmin | null;
+  entrarAdmin: (s: SesionAdmin) => void;
+  salirAdmin: () => void;
   entrar: (c: Comprador) => void;
   actualizar: (datos: Partial<Comprador>) => void;
   salir: () => void;
@@ -27,6 +37,9 @@ export const useSesion = create<EstadoSesion>()(
     (set) => ({
       comprador: null,
       panel: null,
+      admin: null,
+      entrarAdmin: (admin) => set({ admin }),
+      salirAdmin: () => set({ admin: null }),
       entrar: (comprador) => set({ comprador }),
       actualizar: (datos) => set((s) => (s.comprador ? { comprador: { ...s.comprador, ...datos } } : s)),
       salir: () => set({ comprador: null }),
@@ -37,7 +50,7 @@ export const useSesion = create<EstadoSesion>()(
       name: "vitrina.sesion",
       version: 2,
       // Las sesiones de versiones anteriores del boceto no tienen los campos nuevos: se cierran
-      migrate: () => ({ comprador: null, panel: null }) as unknown as EstadoSesion,
+      migrate: () => ({ comprador: null, panel: null, admin: null }) as unknown as EstadoSesion,
     },
   ),
 );

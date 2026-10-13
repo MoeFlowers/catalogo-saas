@@ -70,7 +70,7 @@ export function MisPedidos() {
             const e = EMPRESAS.find((x) => x.slug === p.empresa);
             return (
               <li key={p.id}>
-                <Link to={`/cuenta/pedidos/${p.id}`} className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 rounded-control py-4 hover:bg-hundido sm:px-2">
+                <Link to={`/cuenta/pedidos/${p.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 rounded-control py-4 hover:bg-hundido sm:px-2">
                   <span className="min-w-0">
                     <span className="block truncate font-semibold">{e?.nombre}</span>
                     <span className="cifras block text-sm text-tenue">

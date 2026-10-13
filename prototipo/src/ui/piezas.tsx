@@ -76,7 +76,7 @@ export function BarraBoceto() {
   return (
     <aside aria-label="Aviso del boceto" className="bg-tinta px-4 py-2 text-center text-sm text-white print:hidden">
       Boceto navegable. Empresas, productos y pedidos son de demostración.{" "}
-      <Link to="/" className="font-semibold underline underline-offset-2">
+      <Link to="/recorrido" className="font-semibold underline underline-offset-2">
         Ver recorrido
       </Link>
     </aside>
@@ -91,6 +91,8 @@ export function TasaDelDia() {
       Tasa BCV {formatearTasa(tasas.bcv)}
       {tasas.origen === "demostracion" ? (
         <span className="font-semibold text-alerta"> (de demostración, no se pudo consultar la real)</span>
+      ) : tasas.origen === "manual" ? (
+        <span className="text-tenue"> fijada por Vitrina el {formatearFecha(tasas.fecha)}</span>
       ) : (
         <span className="text-tenue"> del {formatearFecha(tasas.fecha)}</span>
       )}

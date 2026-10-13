@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router";
 import type { TipoEntrega } from "../../datos/tipos";
 import { useCarrito } from "../../estado/carrito";
 import { useDatos } from "../../estado/datos";
+import { suscripcionVencida } from "../../lib/permisos";
 import { useSesion } from "../../estado/sesion";
 import { useTasas } from "../../estado/tasas";
 import { aBs, formatear, formatearTasa, refUsd } from "../../lib/dinero";
@@ -29,6 +30,8 @@ export function MiPedido() {
   const { comprador, actualizar } = useSesion();
   const crearPedido = useDatos((s) => s.crearPedido);
   const productos = useDatos((s) => s.productos);
+  const bloqueado = useDatos((s) => (comprador ? s.bloqueados.includes(comprador.correo) : false));
+  const vencida = suscripcionVencida(empresa);
 
   const [entrega, setEntrega] = useState<TipoEntrega>(empresa.entregas[0]!.tipo);
   const [destino, setDestino] = useState("");
@@ -304,7 +307,13 @@ export function MiPedido() {
         )}
 
         <div className="border-t border-linea pt-6">
-          {comprador ? (
+          {vencida || bloqueado ? (
+            <Aviso tipo="error" titulo={vencida ? `${empresa.nombre} no está recibiendo pedidos por Vitrina` : "Tu cuenta no puede enviar pedidos"}>
+              {vencida
+                ? "Tu pedido queda guardado en este teléfono. Escríbele a la empresa o vuelve a intentarlo más tarde."
+                : "Vitrina bloqueó tu cuenta por un reporte de uso indebido. Si crees que es un error, escribe a soporte."}
+            </Aviso>
+          ) : comprador ? (
             <Boton type="submit" variante="marca" className="w-full sm:w-auto sm:px-8" cargando={enviando} textoCargando="Guardando pedido">
               Enviar pedido por WhatsApp
             </Boton>

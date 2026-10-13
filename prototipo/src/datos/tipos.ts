@@ -39,7 +39,16 @@ export interface Empresa {
   equipo: Miembro[];
   /** Días sin confirmar tras los que un pedido pendiente se cancela solo */
   diasCancelacion: number;
+  estado: EstadoEmpresa;
+  /** Motivo del rechazo o de la suspensión, visible para la empresa */
+  motivoEstado?: string;
+  creada: string;
+  direccion: string;
+  redes: string;
 }
+
+/** Ciclo de una empresa en la plataforma (plan maestro, sección 4.1) */
+export type EstadoEmpresa = "en-revision" | "activa" | "rechazada" | "suspendida";
 
 export type IdPlan = "inicial" | "negocio" | "mayorista";
 
@@ -139,7 +148,7 @@ export interface Tasas {
   usdt: number;
   eur: number | null;
   fecha: string;
-  origen: "en-vivo" | "demostracion";
+  origen: "en-vivo" | "demostracion" | "manual";
 }
 
 export interface Pedido {
@@ -198,6 +207,31 @@ export interface Pago {
   montoCent: number;
   moneda: Moneda;
   estado: "en-revision" | "validado" | "rechazado";
+  /** Plan que se paga: validar el pago activa este plan */
+  plan: IdPlan;
+  comprobante: string;
+  motivo?: string;
+}
+
+export interface Denuncia {
+  id: string;
+  fecha: string;
+  empresa: string;
+  motivo: "estafa" | "ilegal" | "precios" | "otro";
+  detalle: string;
+  autor: string;
+  estado: "abierta" | "resuelta" | "desestimada";
+  resolucion?: string;
+}
+
+/** Acción del equipo de Vitrina sobre una empresa, un pago o un comprador */
+export interface EventoAuditoria {
+  id: string;
+  fecha: string;
+  actor: string;
+  accion: string;
+  objetivo: string;
+  detalle?: string;
 }
 
 export interface Direccion {

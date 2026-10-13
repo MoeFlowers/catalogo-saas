@@ -21,10 +21,11 @@ export function CatalogoLayout() {
 
   if (!empresa) return <NoEncontrado />;
 
-  if (!empresa.publicado) {
+  // Solo se ve el catálogo de una empresa aprobada, activa y que lo publicó (DOMAIN-MODEL, Catalog)
+  if (empresa.estado !== "activa" || !empresa.publicado) {
     return (
       <main id="contenido" tabIndex={-1} className="mx-auto max-w-lg px-4 py-20 text-center outline-none">
-        <h1 className="text-2xl font-bold">{empresa.nombre} pausó su catálogo</h1>
+        <h1 className="text-2xl font-bold">{empresa.estado === "activa" ? `${empresa.nombre} pausó su catálogo` : "Este catálogo no está disponible"}</h1>
         <p className="mt-2 text-tenue">Por ahora no recibe pedidos por aquí. Vuelve más tarde o contacta a la empresa.</p>
         {comprador && (
           <Link to="/cuenta" className="mt-6 inline-flex min-h-11 items-center rounded-control border border-control px-4 font-semibold hover:bg-hundido">
@@ -89,6 +90,11 @@ export function CatalogoLayout() {
             Catálogo publicado con{" "}
             <Link to="/" className="font-semibold text-tinta underline underline-offset-2">
               Vitrina
+            </Link>
+          </p>
+          <p>
+            <Link to={`/c/${empresa.slug}/denunciar`} className="inline-flex min-h-11 items-center underline underline-offset-2">
+              Reportar este catálogo
             </Link>
           </p>
         </div>

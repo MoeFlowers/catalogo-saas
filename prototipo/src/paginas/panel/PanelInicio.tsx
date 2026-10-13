@@ -77,7 +77,7 @@ export function PanelInicio() {
         )}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="space-y-8">
           <section aria-labelledby="por-confirmar">
             <div className="flex items-baseline justify-between gap-4">
@@ -95,7 +95,7 @@ export function PanelInicio() {
               <ul className="mt-3 divide-y divide-linea rounded-tarjeta border border-linea bg-superficie">
                 {porConfirmar.map((p) => (
                   <li key={p.id}>
-                    <Link to={`/panel/pedidos/${p.id}`} className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-0.5 px-4 py-3 hover:bg-hundido">
+                    <Link to={`/panel/pedidos/${p.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-0.5 px-4 py-3 hover:bg-hundido">
                       <span className="font-semibold">
                         <span className="cifras">{numeroPedido(p.numero)}</span> {p.comprador.nombre}
                       </span>

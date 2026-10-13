@@ -74,12 +74,12 @@ export function MarcaEmpresa({ nombre, tamano = 40 }: { nombre: string; tamano?:
 
 export function BarraBoceto() {
   return (
-    <div className="bg-tinta px-4 py-2 text-center text-sm text-white">
+    <aside aria-label="Aviso del boceto" className="bg-tinta px-4 py-2 text-center text-sm text-white print:hidden">
       Boceto navegable. Empresas, productos y pedidos son de demostración.{" "}
       <Link to="/" className="font-semibold underline underline-offset-2">
         Ver recorrido
       </Link>
-    </div>
+    </aside>
   );
 }
 

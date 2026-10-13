@@ -98,16 +98,14 @@ export function PanelLayout() {
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[15rem_1fr]">
-      <aside className="hidden border-r border-linea bg-superficie lg:flex lg:min-h-dvh lg:flex-col print:hidden">
+      <nav aria-label="Secciones del panel" className="hidden border-r border-linea bg-superficie lg:flex lg:min-h-dvh lg:flex-col print:hidden">
         <div className="border-b border-linea px-4 py-4">
           <p className="font-bold leading-tight">{empresa.nombre}</p>
           <p className="text-sm text-tenue">
             {sesion.nombre || sesion.correo}, {NOMBRE_ROL[sesion.rol].toLowerCase()}
           </p>
         </div>
-        <nav aria-label="Panel" className="flex-1 space-y-0.5 p-3">
-          {SECCIONES.map((s) => enlace(s, false))}
-        </nav>
+        <div className="flex-1 space-y-0.5 p-3">{SECCIONES.map((s) => enlace(s, false))}</div>
         <div className="space-y-0.5 border-t border-linea p-3">
           <Link to={`/c/${empresa.slug}`} className="flex min-h-11 items-center gap-3 rounded-control px-3 text-sm font-semibold text-tenue hover:bg-hundido hover:text-tinta">
             <ExternalLink size={18} aria-hidden />
@@ -118,7 +116,7 @@ export function PanelLayout() {
             Salir
           </button>
         </div>
-      </aside>
+      </nav>
 
       <div className="min-w-0">
         <header className="flex items-center gap-3 border-b border-linea bg-superficie px-4 py-3 lg:hidden print:hidden">
@@ -145,7 +143,7 @@ export function PanelLayout() {
         </main>
       </div>
 
-      <nav aria-label="Panel" className="fixed inset-x-0 bottom-0 z-20 flex border-t border-linea bg-superficie pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden">
+      <nav aria-label="Accesos rápidos del panel" className="fixed inset-x-0 bottom-0 z-20 flex border-t border-linea bg-superficie pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden">
         {SECCIONES.filter((s) => s.principal).map((s) => enlace(s, true))}
         {enlace({ ruta: "/panel/mas", texto: "Más", Icono: Ellipsis }, true)}
       </nav>

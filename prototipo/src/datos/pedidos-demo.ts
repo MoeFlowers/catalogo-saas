@@ -26,6 +26,8 @@ interface Semilla {
   cliente: string;
   correo: string;
   delComprador?: boolean;
+  /** Si el comprador llegó a abrir WhatsApp con el pedido */
+  abrioWhatsapp?: boolean;
 }
 
 const SEMILLAS: Semilla[] = [
@@ -35,7 +37,7 @@ const SEMILLAS: Semilla[] = [
       { productoId: "cable-12", presentacionId: "rollo-100", cantidad: 2 },
       { productoId: "toma-doble", presentacionId: "caja-10", cantidad: 3 },
     ],
-    entrega: "delivery", destino: "Zona industrial norte", cliente: "Cliente de prueba A", correo: "cliente-a@ejemplo.test",
+    entrega: "delivery", destino: "Zona industrial norte", cliente: "Cliente de prueba A", correo: "cliente-a@ejemplo.test", abrioWhatsapp: true,
   },
   {
     empresa: "ferreteria-ejemplo", numero: 36, dias: 2, estados: ["pendiente", "confirmado", "preparacion"],
@@ -44,7 +46,7 @@ const SEMILLAS: Semilla[] = [
       { productoId: "rodillo", presentacionId: "unidad", cantidad: 2 },
       { productoId: "brocha-3", presentacionId: "unidad", cantidad: 12 },
     ],
-    entrega: "retiro", destino: "", cliente: "Cliente de prueba B", correo: "cliente-b@ejemplo.test",
+    entrega: "retiro", destino: "", cliente: "Cliente de prueba B", correo: "cliente-b@ejemplo.test", abrioWhatsapp: true,
   },
   {
     empresa: "ferreteria-ejemplo", numero: 37, dias: 1, estados: ["pendiente", "confirmado"],
@@ -53,7 +55,7 @@ const SEMILLAS: Semilla[] = [
       { productoId: "codo-pvc", presentacionId: "bolsa-25", cantidad: 4 },
       { productoId: "llave-paso", presentacionId: "unidad", cantidad: 6 },
     ],
-    entrega: "encomienda", destino: "Maracay", cliente: "Cliente de prueba C", correo: "cliente-c@ejemplo.test",
+    entrega: "encomienda", destino: "Maracay", cliente: "Cliente de prueba C", correo: "cliente-c@ejemplo.test", abrioWhatsapp: true,
   },
   {
     empresa: "ferreteria-ejemplo", numero: 38, dias: 21, estados: ["pendiente", "confirmado", "preparacion", "despachado", "entregado"],
@@ -81,7 +83,7 @@ const SEMILLAS: Semilla[] = [
   {
     empresa: "textiles-ejemplo", numero: 37, dias: 3, estados: ["pendiente", "confirmado", "preparacion", "despachado"],
     lineas: [{ productoId: "braga-industrial", varianteId: "l", presentacionId: "unidad", cantidad: 10 }],
-    entrega: "encomienda", destino: "Valencia", cliente: "Cliente de prueba F", correo: "cliente-f@ejemplo.test",
+    entrega: "encomienda", destino: "Valencia", cliente: "Cliente de prueba F", correo: "cliente-f@ejemplo.test", abrioWhatsapp: true,
   },
   {
     empresa: "textiles-ejemplo", numero: 40, dias: 6, estados: ["pendiente", "confirmado"],
@@ -119,6 +121,7 @@ export function pedidosSemilla(empresas: Empresa[], productos: Producto[]): Pedi
       compradorCorreo: s.correo,
       demostracion: true,
       semillaComprador: s.delComprador,
+      whatsappAbierto: s.abrioWhatsapp || s.delComprador ? hace(s.dias, 2) : undefined,
     };
   });
 }

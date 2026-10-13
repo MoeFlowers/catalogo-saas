@@ -63,7 +63,7 @@ export function Portada() {
   return (
     <>
       <div className="mx-auto max-w-6xl px-4 pb-10 pt-6">
-        <section aria-labelledby="titulo-empresa" className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+        <section aria-labelledby="titulo-empresa" className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <div>
             <h1 id="titulo-empresa" className="text-2xl font-bold sm:text-3xl">
               {empresa.nombre}
@@ -150,7 +150,7 @@ export function Portada() {
         {visibles.length === 0 ? (
           <div className="mt-6">
             <EstadoVacio
-              titulo={q ? `No encontramos "${q}"` : "No hay productos con estos filtros"}
+              titulo={todos.length === 0 ? "Este catálogo todavía no tiene productos" : q ? `No encontramos "${q}"` : "No hay productos con estos filtros"}
               accion={
                 hayFiltros && (
                   <Boton onClick={() => setParams({}, { replace: true })}>
@@ -160,7 +160,11 @@ export function Portada() {
                 )
               }
             >
-              {q ? "Prueba con una palabra más corta o con el código del producto." : "Prueba con otra categoría."}
+              {todos.length === 0
+                ? `${empresa.nombre} está cargando su catálogo. Vuelve pronto o escríbele a la empresa.`
+                : q
+                  ? "Prueba con una palabra más corta o con el código del producto."
+                  : "Prueba con otra categoría."}
             </EstadoVacio>
           </div>
         ) : (

@@ -5,7 +5,7 @@ import { EMPRESAS_SEMILLA } from "../datos/empresas";
 import { pedidosSemilla } from "../datos/pedidos-demo";
 import { planDe } from "../datos/planes";
 import { PRODUCTOS_SEMILLA } from "../datos/productos";
-import type { Empresa, EstadoPedido, Miembro, Movimiento, Pago, Pedido, Producto, Rol } from "../datos/tipos";
+import type { Denuncia, Empresa, EstadoPedido, EventoAuditoria, Miembro, Movimiento, Pago, Pedido, Producto, Rol } from "../datos/tipos";
 import { disponible, fisico, mover, type Clave } from "../lib/inventario";
 
 // Datos del boceto en un solo almacén para que cada cambio de estado de un pedido mueva el inventario
@@ -33,6 +33,8 @@ function hace(dias: number): string {
   d.setDate(d.getDate() - dias);
   return d.toISOString();
 }
+
+const enDias = (dias: number) => hace(-dias);
 
 interface Unidades {
   clave: Clave;
@@ -89,7 +91,20 @@ function estadoInicial() {
     }
   }
 
-  return { empresas, productos, pedidos, movimientos, pagos: [] as Pago[] };
+  // Un pago esperando validación y una denuncia abierta, para que el panel de la plataforma tenga trabajo
+  const pagos: Pago[] = [
+    {
+      id: nuevoId("pago"), empresa: "textiles-ejemplo", fecha: hace(1), metodo: "pago-movil", referencia: "00000000 (demostración)",
+      montoCent: 0, moneda: "VES", estado: "en-revision", plan: "inicial", comprobante: "comprobante-demostracion.jpg",
+    },
+  ];
+  const denuncias: Denuncia[] = [
+    {
+      id: nuevoId("den"), fecha: hace(2), empresa: "ferreteria-ejemplo", motivo: "precios",
+      detalle: "Denuncia de demostración: el precio en Bs no coincidía con el que me dieron por WhatsApp.", autor: "cliente-c@ejemplo.test", estado: "abierta",
+    },
+  ];
+  return { empresas, productos, pedidos, movimientos, pagos, denuncias, auditoria: [] as EventoAuditoria[], bloqueados: [] as string[] };
 }
 
 export interface NuevoMovimiento {
@@ -108,6 +123,22 @@ interface EstadoDatos {
   pedidos: Pedido[];
   movimientos: Movimiento[];
   pagos: Pago[];
+  denuncias: Denuncia[];
+  auditoria: EventoAuditoria[];
+  /** Correos de compradores bloqueados por abuso: no pueden enviar pedidos */
+  bloqueados: string[];
+
+  registrarEmpresa: (e: Empresa) => void;
+  aprobarEmpresa: (slug: string, actor: string) => void;
+  rechazarEmpresa: (slug: string, motivo: string, actor: string) => void;
+  suspenderEmpresa: (slug: string, motivo: string, actor: string) => void;
+  reactivarEmpresa: (slug: string, actor: string) => void;
+  validarPago: (id: string, actor: string) => void;
+  rechazarPago: (id: string, motivo: string, actor: string) => void;
+  denunciar: (d: Omit<Denuncia, "id" | "fecha" | "estado">) => void;
+  resolverDenuncia: (id: string, estado: "resuelta" | "desestimada", resolucion: string, actor: string) => void;
+  bloquearComprador: (correo: string, bloquear: boolean, motivo: string, actor: string) => void;
+  auditar: (actor: string, accion: string, objetivo: string, detalle?: string) => void;
 
   crearPedido: (datos: Omit<Pedido, "id" | "numero">) => Pedido;
   asignarSemillas: (correo: string) => void;
@@ -317,11 +348,62 @@ export const useDatos = create<EstadoDatos>()(
       reportarPago: (pago) =>
         set((s) => ({ pagos: [{ ...pago, id: nuevoId("pago"), fecha: new Date().toISOString(), estado: "en-revision" }, ...s.pagos] })),
 
+      auditar: (actor, accion, objetivo, detalle) =>
+        set((s) => ({ auditoria: [{ id: nuevoId("aud"), fecha: new Date().toISOString(), actor, accion, objetivo, detalle }, ...s.auditoria] })),
+
+      registrarEmpresa: (e) => set((s) => ({ empresas: [...s.empresas, e] })),
+
+      aprobarEmpresa: (slug, actor) => {
+        // La prueba de 30 días empieza al aprobar, no al registrarse
+        get().actualizarEmpresa(slug, { estado: "activa", motivoEstado: undefined, vence: enDias(30) });
+        get().auditar(actor, "Aprobó la empresa", slug);
+      },
+      rechazarEmpresa: (slug, motivo, actor) => {
+        get().actualizarEmpresa(slug, { estado: "rechazada", motivoEstado: motivo, publicado: false });
+        get().auditar(actor, "Rechazó la empresa", slug, motivo);
+      },
+      suspenderEmpresa: (slug, motivo, actor) => {
+        get().actualizarEmpresa(slug, { estado: "suspendida", motivoEstado: motivo });
+        get().auditar(actor, "Suspendió la empresa", slug, motivo);
+      },
+      reactivarEmpresa: (slug, actor) => {
+        get().actualizarEmpresa(slug, { estado: "activa", motivoEstado: undefined });
+        get().auditar(actor, "Reactivó la empresa", slug);
+      },
+
+      validarPago: (id, actor) => {
+        const pago = get().pagos.find((p) => p.id === id);
+        const empresa = get().empresas.find((e) => e.slug === pago?.empresa);
+        if (!pago || !empresa) return;
+        // Extiende 30 días desde el vencimiento actual, o desde hoy si ya venció
+        const base = Math.max(Date.now(), new Date(empresa.vence).getTime());
+        get().actualizarEmpresa(empresa.slug, { vence: new Date(base + 30 * 86_400_000).toISOString(), plan: pago.plan });
+        set((s) => ({ pagos: s.pagos.map((p) => (p.id === id ? { ...p, estado: "validado" } : p)) }));
+        get().auditar(actor, "Validó un pago", empresa.slug, `ref. ${pago.referencia}, plan ${planDe(pago.plan).nombre}`);
+      },
+      rechazarPago: (id, motivo, actor) => {
+        const pago = get().pagos.find((p) => p.id === id);
+        set((s) => ({ pagos: s.pagos.map((p) => (p.id === id ? { ...p, estado: "rechazado", motivo } : p)) }));
+        if (pago) get().auditar(actor, "Rechazó un pago", pago.empresa, `ref. ${pago.referencia}: ${motivo}`);
+      },
+
+      denunciar: (d) => set((s) => ({ denuncias: [{ ...d, id: nuevoId("den"), fecha: new Date().toISOString(), estado: "abierta" }, ...s.denuncias] })),
+      resolverDenuncia: (id, estado, resolucion, actor) => {
+        const d = get().denuncias.find((x) => x.id === id);
+        set((s) => ({ denuncias: s.denuncias.map((x) => (x.id === id ? { ...x, estado, resolucion } : x)) }));
+        if (d) get().auditar(actor, estado === "resuelta" ? "Resolvió una denuncia" : "Desestimó una denuncia", d.empresa, resolucion);
+      },
+
+      bloquearComprador: (correo, bloquear, motivo, actor) => {
+        set((s) => ({ bloqueados: bloquear ? [...new Set([...s.bloqueados, correo])] : s.bloqueados.filter((c) => c !== correo) }));
+        get().auditar(actor, bloquear ? "Bloqueó un comprador" : "Desbloqueó un comprador", correo, motivo || undefined);
+      },
+
       reiniciar: () => set(estadoInicial()),
     }),
     {
       name: "vitrina.datos",
-      version: 4,
+      version: 5,
       // El boceto no conserva datos de versiones anteriores: vuelve a la demostración inicial
       migrate: () => estadoInicial() as unknown as EstadoDatos,
     },

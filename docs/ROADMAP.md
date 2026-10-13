@@ -55,8 +55,10 @@ Dos empresas de demostración: una ferretería mayorista y una tienda de ropa, m
       cantidades antes de confirmar, cancelación automática de pendientes, nota imprimible
 - [x] El ciclo del pedido mueve el inventario: confirmar reserva, listo o despachado descuenta,
       cancelar libera; cada cambio queda en el registro de movimientos
-- [ ] Panel de plataforma: Resumen, Solicitudes con aprobar y rechazar, Empresas, Pagos, Tasas
-- [ ] Sitio: portada, planes, registro de empresa con los pasos de doble factor, estado En revisión
+- [x] Panel de plataforma: Resumen, Solicitudes con aprobar y rechazar, Empresas, Pagos, Tasas; además
+      Denuncias, Compradores (bloqueo), Planes, Auditoría y modo soporte en solo lectura
+- [x] Sitio: portada, planes, registro de empresa con los pasos de doble factor, estado En revisión;
+      términos y privacidad en borrador, reporte de catálogos, permisos por rol en el panel
 - [ ] Revisión contigo en celular y escritorio; lista de cambios
 - [ ] Ajustes de la revisión
 - [x] Revisión de accesibilidad con axe y teclado: 26 pantallas sin violaciones WCAG 2.2 AA

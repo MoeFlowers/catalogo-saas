@@ -12,7 +12,7 @@ import { Aviso } from "../../ui/piezas";
 import { Casilla, Selector } from "../../ui/Selector";
 import { NoEncontrado } from "../NoEncontrado";
 import { aCentimos, deCentimos, Encabezado, enteroPositivo } from "./comun";
-import { usePanel } from "./PanelLayout";
+import { SinPermiso, usePanel } from "./PanelLayout";
 
 interface Fila {
   id: string;
@@ -84,7 +84,7 @@ function Seccion({ titulo, children, descripcion }: { titulo: string; descripcio
 }
 
 export function EditorProducto() {
-  const { empresa, sesion } = usePanel();
+  const { empresa, sesion, puede } = usePanel();
   const { id } = useParams();
   const nuevo = id === "nuevo";
   const existente = useProducto(nuevo ? undefined : id);
@@ -371,9 +371,13 @@ export function EditorProducto() {
           <Link to="/panel/productos" className="inline-flex min-h-11 items-center justify-center rounded-control px-4 font-semibold hover:bg-hundido">
             Descartar cambios
           </Link>
-          <Boton type="submit" variante="accion">
-            {nuevo ? "Crear producto" : "Guardar cambios"}
-          </Boton>
+          {puede("productos") ? (
+            <Boton type="submit" variante="accion">
+              {nuevo ? "Crear producto" : "Guardar cambios"}
+            </Boton>
+          ) : (
+            <SinPermiso que="crear ni editar productos" />
+          )}
         </div>
       </form>
       {!nuevo && (

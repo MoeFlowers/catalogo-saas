@@ -1,0 +1,10 @@
+{
+  "identities": [
+    {
+      "name": "vitrina",
+      "credentials": [{ "accessKey": "vitrina", "secretKey": "solo-desarrollo" }],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    },
+    { "name": "anonymous", "actions": ["Read"] }
+  ]
+}

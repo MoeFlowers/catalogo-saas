@@ -37,3 +37,10 @@ Products carry images. The directive: do **not** store binaries in PostgreSQL; u
 - **Positive:** cheap, scalable images; DB stays lean; provider-agnostic; safe uploads; reproducible dev.
 - **Negative / mitigations:** server-side re-encode costs CPU (acceptable at MVP volume; can move to a job/queue if a Redis trigger fires — ADR-0001); orphaned objects on failure → periodic reconciliation (P10).
 - **Tests:** MIME/size rejection, magic-byte check, re-encode strips metadata, tenant-namespaced keys, reference integrity.
+
+## Nota (2026-10-13): SeaweedFS en lugar de MinIO en desarrollo
+
+MinIO dejó de publicar sus imágenes de contenedor en Docker Hub y quay.io (las descargas devuelven
+"acceso denegado"). El entorno local usa SeaweedFS (`chrislusf/seaweedfs`) con su pasarela S3 en el
+puerto 8333. La decisión de fondo no cambia: la app habla S3 a través del puerto `Storage`, así que en
+producción sigue Cloudflare R2 (u otro S3) sin tocar código.

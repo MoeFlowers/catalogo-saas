@@ -16,14 +16,39 @@ Estado: fase A, boceto navegable (desde el 2026-10-12). Todavía no hay aplicaci
 | [`docs/DOMAIN-MODEL.md`](docs/DOMAIN-MODEL.md), [`docs/DATABASE-DESIGN.md`](docs/DATABASE-DESIGN.md) | Modelo de dominio y esquema (se actualizan en la fase B) |
 | [`docs/historico/`](docs/historico/) | Planes reemplazados |
 
+## Arrancar en tu PC
+
+Necesitas Node 22, pnpm 10 y Docker Desktop abierto.
+
+```bash
+cp .env.example .env          # y genera BETTER_AUTH_SECRET como indica el archivo
+docker compose up -d          # PostgreSQL, imágenes (S3) y correos de prueba
+pnpm install
+pnpm db:migrar && pnpm db:migrar --test
+pnpm dev                      # http://localhost:4200
+```
+
+| Comando | Qué hace |
+|---|---|
+| `pnpm test` | Pruebas unitarias y de integración (incluye el aislamiento entre empresas) |
+| `pnpm test:e2e` | Recorre la app en Chromium, en celular y escritorio, con axe |
+| `pnpm lint`, `pnpm typecheck` | Calidad y tipos |
+| `pnpm db:semilla` | Datos de demostración |
+| `pnpm db:reiniciar` | Borra el esquema (solo desarrollo) |
+
+Correos de prueba en http://localhost:8025.
+
 ## Estructura
 
 ```
-prototipo/   boceto navegable con datos de demostración (fase A), publicado en GitHub Pages
-docs/        plan, roadmap y decisiones
+src/app/         rutas de Next.js (sitio, catálogo, cuenta, panel, admin, API)
+src/modulos/     lógica de negocio por módulo
+src/lib/db/      esquema Drizzle y cliente con contexto de seguridad por fila
+drizzle/         migraciones SQL
+test/            integración (Vitest) y extremo a extremo (Playwright)
+prototipo/       boceto navegable de la fase A, publicado en GitHub Pages
+docs/            plan, roadmap y decisiones
 ```
-
-La aplicación real (Next.js, PostgreSQL, Docker) empieza en la fase B.
 
 ## Herramientas
 

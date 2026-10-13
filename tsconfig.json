@@ -1,8 +1,12 @@
 {
-  "//": "TypeScript POLICY for Vitrina (Sprint 1.1). Strict baseline. Sprint 1.2 extends this for Next.js (adds DOM lib, jsx, the next plugin). No 'any' is permitted as a shortcut.",
+  "//": "TypeScript POLICY for Vitrina. Strict baseline from Sprint 1.1, extended for Next.js (DOM lib, jsx, next plugin). No 'any' as a shortcut.",
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "moduleDetection": "force",
@@ -12,7 +16,6 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "noEmit": true,
-
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -22,12 +25,33 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "jsx": "react-jsx",
+    "allowJs": false,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["src", "test"],
-  "exclude": ["node_modules", ".next", "dist", "build"]
+  "include": [
+    "next-env.d.ts",
+    "src",
+    "test",
+    "*.ts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "dist",
+    "build",
+    "prototipo"
+  ]
 }

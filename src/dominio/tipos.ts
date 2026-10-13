@@ -105,6 +105,8 @@ export interface LineaPedido {
 
 /** Copia fija de una línea al momento de pedir */
 export interface ItemPedido {
+  /** Id de la línea en la base; no existe mientras el pedido se arma */
+  id?: string | undefined;
   productoId: string | null;
   varianteId?: string | null | undefined;
   presentacionId: string | null;

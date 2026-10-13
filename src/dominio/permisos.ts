@@ -28,3 +28,8 @@ export function puede(rol: Rol, area: Area, empresa: Pick<Empresa, "estado">): b
 export function suscripcionVencida(e: Pick<Empresa, "vence">): boolean {
   return new Date(e.vence).getTime() < Date.now();
 }
+
+/** Días enteros que faltan hasta una fecha (negativo si ya pasó) */
+export function diasHasta(iso: string): number {
+  return Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
+}

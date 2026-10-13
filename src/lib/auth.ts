@@ -23,6 +23,8 @@ export const auth = betterAuth({
     minPasswordLength: 12,
     maxPasswordLength: 128,
     requireEmailVerification: true,
+    // Cambiar la contraseña con el código del correo cierra todas las sesiones abiertas
+    revokeSessionsOnPasswordReset: true,
     password: {
       hash: (clave) => hash(clave, ARGON),
       verify: ({ hash: guardado, password }) => verify(guardado, password),

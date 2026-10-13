@@ -2,7 +2,7 @@ import { ChevronLeft } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import type { Comprador } from "../datos/tipos";
-import { usePedidos } from "../estado/pedidos";
+import { useDatos } from "../estado/datos";
 import { useSesion } from "../estado/sesion";
 import { Boton } from "../ui/Boton";
 import { Campo } from "../ui/Campo";
@@ -29,7 +29,7 @@ export function Entrar() {
   const vieneDePedido = volver.includes("/pedido");
   const navegar = useNavigate();
   const entrar = useSesion((s) => s.entrar);
-  const sembrar = usePedidos((s) => s.sembrar);
+  const asignarSemillas = useDatos((s) => s.asignarSemillas);
 
   const [modo, setModo] = useState<"entrar" | "crear">("entrar");
   const [nombre, setNombre] = useState("");
@@ -40,14 +40,14 @@ export function Entrar() {
 
   const terminar = (c: Comprador) => {
     entrar(c);
-    sembrar();
+    asignarSemillas(c.correo);
     navegar(volver, { replace: true });
   };
 
   const conGoogle = () => {
     setCargando("google");
     setTimeout(
-      () => terminar({ nombre: "Comprador de prueba", correo: "comprador@ejemplo.com", telefono: "", documento: "", razonSocial: "", metodo: "google" }),
+      () => terminar({ nombre: "Comprador de prueba", correo: "comprador@ejemplo.test", telefono: "", documento: "", razonSocial: "", metodo: "google", direcciones: [] }),
       500,
     );
   };
@@ -73,6 +73,7 @@ export function Entrar() {
           documento: "",
           razonSocial: "",
           metodo: "correo",
+          direcciones: [],
         }),
       500,
     );

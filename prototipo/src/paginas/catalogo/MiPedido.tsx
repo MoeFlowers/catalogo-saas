@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import type { TipoEntrega } from "../../datos/tipos";
 import { useCarrito } from "../../estado/carrito";
-import { usePedidos } from "../../estado/pedidos";
+import { useDatos } from "../../estado/datos";
 import { useSesion } from "../../estado/sesion";
 import { useTasas } from "../../estado/tasas";
 import { aBs, formatear, formatearTasa, refUsd } from "../../lib/dinero";
@@ -27,7 +27,8 @@ export function MiPedido() {
   const lineas = useCarrito((s) => s.porEmpresa[empresa.slug]) ?? [];
   const { cambiar, quitar, vaciar } = useCarrito();
   const { comprador, actualizar } = useSesion();
-  const crearPedido = usePedidos((s) => s.crear);
+  const crearPedido = useDatos((s) => s.crearPedido);
+  const productos = useDatos((s) => s.productos);
 
   const [entrega, setEntrega] = useState<TipoEntrega>(empresa.entregas[0]!.tipo);
   const [destino, setDestino] = useState("");
@@ -68,7 +69,7 @@ export function MiPedido() {
     );
   }
 
-  const calculadas = lineas.map((l) => calcularLinea(l, empresa, tasas)).filter((c) => c != null);
+  const calculadas = lineas.map((l) => calcularLinea(l, empresa, tasas, productos)).filter((c) => c != null);
   const totalBs = calculadas.reduce((s, c) => s + c.totalBsCent, 0);
   const totalCent = calculadas.reduce((s, c) => s + c.totalCent, 0);
   const minimoBs = aBs(empresa.pedidoMinimoCent, empresa.monedaBase, tasas) ?? 0;
@@ -116,6 +117,7 @@ export function MiPedido() {
         destino: metodo.pideDireccion ? destino.trim() : "",
         nota: nota.trim(),
         comprador: { nombre: nombre.trim(), telefono: telefono.trim(), documento: documento.trim() },
+        compradorCorreo: comprador!.correo,
       });
       actualizar({ nombre: nombre.trim(), telefono: telefono.trim(), documento: documento.trim() });
       vaciar(empresa.slug);
@@ -242,6 +244,26 @@ export function MiPedido() {
               </label>
             ))}
           </div>
+          {metodo.pideDireccion && comprador && (comprador.direcciones ?? []).length > 0 && (
+            <div className="space-y-1.5">
+              <label htmlFor="dir-guardada" className="block text-sm font-semibold">
+                Usar una dirección guardada
+              </label>
+              <select
+                id="dir-guardada"
+                value={(comprador.direcciones ?? []).find((d) => d.detalle === destino)?.id ?? ""}
+                onChange={(e) => setDestino((comprador.direcciones ?? []).find((d) => d.id === e.target.value)?.detalle ?? "")}
+                className="block min-h-11 w-full rounded-control border border-control bg-superficie px-3 text-base"
+              >
+                <option value="">Escribir otra</option>
+                {(comprador.direcciones ?? []).map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           {metodo.pideDireccion && (
             <Campo
               id="destino"

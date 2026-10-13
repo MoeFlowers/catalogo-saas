@@ -1,8 +1,8 @@
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
-import { productoPorId } from "../../datos/productos";
 import { useCarrito } from "../../estado/carrito";
+import { useProducto } from "../../estado/datos";
 import { useTasas } from "../../estado/tasas";
 import { aBs, formatear } from "../../lib/dinero";
 import { cantidadInicial, nivelStock, paso, precioUnitario, presentacion, textoStock, validarCantidad } from "../../lib/precio";
@@ -18,15 +18,15 @@ import { textoCantidad } from "./TarjetaProducto";
 export function FichaProducto() {
   const empresa = useEmpresa();
   const { id } = useParams();
-  const producto = productoPorId(id);
-  if (!producto || producto.empresa !== empresa.slug) return <NoEncontrado />;
+  const producto = useProducto(id);
+  if (!producto || producto.empresa !== empresa.slug || !producto.activo) return <NoEncontrado />;
   // key reinicia la selección al navegar de un producto a otro
   return <Ficha key={producto.id} productoId={producto.id} />;
 }
 
 function Ficha({ productoId }: { productoId: string }) {
   const empresa = useEmpresa();
-  const p = productoPorId(productoId)!;
+  const p = useProducto(productoId)!;
   const tasas = useTasas((s) => s.tasas);
   const agregar = useCarrito((s) => s.agregar);
 

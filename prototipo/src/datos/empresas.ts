@@ -1,7 +1,19 @@
-import type { Empresa } from "./tipos";
+import type { Empresa, Miembro } from "./tipos";
+
+function enDias(n: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d.toISOString();
+}
+
+// Quien entra al panel en el boceto es el dueño; el resto del equipo son cuentas de prueba sin nombres reales
+const equipo = (dominio: string): Miembro[] => [
+  { correo: `dueno@${dominio}`, nombre: "Cuenta de prueba", rol: "dueno", estado: "activo" },
+  { correo: `ventas@${dominio}`, nombre: "Vendedor de prueba", rol: "vendedor", estado: "activo" },
+];
 
 // Empresas ficticias para probar el diseño. Nombres, RIF y datos son de demostración.
-export const EMPRESAS: Empresa[] = [
+export const EMPRESAS_SEMILLA: Empresa[] = [
   {
     slug: "ferreteria-ejemplo",
     nombre: "Ferretería Ejemplo",
@@ -15,6 +27,12 @@ export const EMPRESAS: Empresa[] = [
     monedaBase: "USD",
     pedidoMinimoCent: 5000,
     mostrarStock: "nivel",
+    whatsapp: "",
+    publicado: true,
+    plan: "negocio",
+    vence: enDias(18),
+    equipo: equipo("ferreteria-ejemplo.test"),
+    diasCancelacion: 3,
     entregas: [
       { tipo: "retiro", detalle: "Zona industrial, galpón 4. En horario de atención.", pideDireccion: false },
       { tipo: "delivery", detalle: "Delivery propio en Valencia. Costo según la zona, se coordina por WhatsApp.", pideDireccion: true },
@@ -41,6 +59,12 @@ export const EMPRESAS: Empresa[] = [
     monedaBase: "USD",
     pedidoMinimoCent: 10000,
     mostrarStock: "cantidad",
+    whatsapp: "",
+    publicado: true,
+    plan: "inicial",
+    vence: enDias(5),
+    equipo: equipo("textiles-ejemplo.test").slice(0, 1),
+    diasCancelacion: 5,
     entregas: [
       { tipo: "retiro", detalle: "Tienda en el centro. En horario de atención.", pideDireccion: false },
       { tipo: "encomienda", detalle: "Envío nacional por encomienda, cobro a destino.", pideDireccion: true },
@@ -54,7 +78,3 @@ export const EMPRESAS: Empresa[] = [
     ],
   },
 ];
-
-export function empresaPorSlug(slug: string | undefined): Empresa | undefined {
-  return EMPRESAS.find((e) => e.slug === slug);
-}

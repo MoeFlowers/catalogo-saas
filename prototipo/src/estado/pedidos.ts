@@ -1,35 +1,4 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { EstadoPedido, Pedido } from "../datos/tipos";
-import { pedidosDemostracion } from "../datos/pedidos-demo";
-
-interface EstadoPedidos {
-  lista: Pedido[];
-  sembrado: boolean;
-  sembrar: () => void;
-  crear: (p: Omit<Pedido, "id" | "numero">) => Pedido;
-}
-
-export const usePedidos = create<EstadoPedidos>()(
-  persist(
-    (set, get) => ({
-      lista: [],
-      sembrado: false,
-      sembrar: () => {
-        if (get().sembrado) return;
-        set((s) => ({ lista: [...pedidosDemostracion(), ...s.lista], sembrado: true }));
-      },
-      crear: (datos) => {
-        const deEmpresa = get().lista.filter((p) => p.empresa === datos.empresa);
-        const numero = Math.max(40, ...deEmpresa.map((p) => p.numero)) + 1;
-        const pedido: Pedido = { ...datos, id: `${datos.empresa}-${numero}`, numero };
-        set((s) => ({ lista: [pedido, ...s.lista] }));
-        return pedido;
-      },
-    }),
-    { name: "vitrina.pedidos" },
-  ),
-);
+import type { EstadoPedido } from "../datos/tipos";
 
 export const NOMBRE_ESTADO: Record<EstadoPedido, string> = {
   pendiente: "Pendiente",

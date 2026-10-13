@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { EMPRESAS } from "../datos/empresas";
+import { useDatos } from "../estado/datos";
 import { marcaSegura } from "../lib/color";
 import { Boton } from "../ui/Boton";
 
@@ -11,12 +11,12 @@ const QUE_PROBAR: Record<string, string> = {
 };
 
 const SIGUE = [
-  "Panel de la empresa: pedidos, productos, inventario, entrega y equipo",
   "Panel de la plataforma: solicitudes de empresas, pagos y tasas",
   "Sitio de Vitrina y registro de empresas con doble factor",
 ];
 
 export function Recorrido() {
+  const EMPRESAS = useDatos((s) => s.empresas);
   const [confirmar, setConfirmar] = useState(false);
   const [reiniciado, setReiniciado] = useState(false);
 
@@ -92,9 +92,29 @@ export function Recorrido() {
         </ul>
       </section>
 
+      <section aria-labelledby="titulo-empresa" className="mt-10">
+        <h2 id="titulo-empresa" className="text-xl font-bold">
+          Atiende como empresa
+        </h2>
+        <ul className="mt-3 divide-y divide-linea border-y border-linea">
+          <li>
+            <Link to="/panel" className="flex items-center gap-4 rounded-control py-4 hover:bg-hundido sm:px-2">
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold">Panel de la empresa</span>
+                <span className="block text-sm text-tenue">
+                  Confirma pedidos y mira cómo se aparta y descuenta el inventario. Productos, entrega, catálogo, equipo y suscripción. Entra con verificación en dos pasos.
+                </span>
+              </span>
+              <ChevronRight size={18} className="shrink-0 text-tenue" aria-hidden />
+            </Link>
+          </li>
+        </ul>
+        <p className="mt-2 text-sm text-tenue">Los pedidos que hagas como cliente le llegan al panel de esa empresa.</p>
+      </section>
+
       <section aria-labelledby="titulo-sigue" className="mt-10">
         <h2 id="titulo-sigue" className="text-xl font-bold">
-          En construcción esta semana y la próxima
+          En construcción esta semana
         </h2>
         <ul className="mt-3 list-disc space-y-1 pl-5 text-tenue">
           {SIGUE.map((s) => (

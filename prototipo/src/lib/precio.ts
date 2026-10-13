@@ -1,4 +1,5 @@
 import type { Empresa, Presentacion, Producto } from "../datos/tipos";
+import { disponible } from "./inventario";
 
 function mcd(a: number, b: number): number {
   return b === 0 ? a : mcd(b, a % b);
@@ -28,10 +29,9 @@ export function cantidadInicial(p: Producto, pres: Presentacion): number {
   return n;
 }
 
+/** Lo que el catálogo ofrece: stock físico menos lo reservado por pedidos confirmados */
 export function stockDe(p: Producto, varianteId?: string): number {
-  if (p.variantes && varianteId) return p.variantes.find((v) => v.id === varianteId)?.stock ?? 0;
-  if (p.variantes) return p.variantes.reduce((s, v) => s + v.stock, 0);
-  return p.stock;
+  return disponible(p, varianteId);
 }
 
 export type Nivel = "disponible" | "pocas" | "agotado" | "bajo-pedido";

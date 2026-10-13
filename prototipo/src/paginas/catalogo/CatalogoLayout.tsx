@@ -1,9 +1,9 @@
 import { ShoppingBag, UserRound } from "lucide-react";
 import type { CSSProperties } from "react";
 import { Link, Outlet, useOutletContext, useParams } from "react-router";
-import { empresaPorSlug } from "../../datos/empresas";
 import type { Empresa } from "../../datos/tipos";
 import { useCarrito } from "../../estado/carrito";
+import { useEmpresaPorSlug } from "../../estado/datos";
 import { useSesion } from "../../estado/sesion";
 import { marcaSegura } from "../../lib/color";
 import { MarcaEmpresa } from "../../ui/piezas";
@@ -15,11 +15,25 @@ export function useEmpresa(): Empresa {
 
 export function CatalogoLayout() {
   const { slug } = useParams();
-  const empresa = empresaPorSlug(slug);
+  const empresa = useEmpresaPorSlug(slug);
   const lineas = useCarrito((s) => (slug ? s.porEmpresa[slug] : undefined)) ?? [];
   const comprador = useSesion((s) => s.comprador);
 
   if (!empresa) return <NoEncontrado />;
+
+  if (!empresa.publicado) {
+    return (
+      <main id="contenido" tabIndex={-1} className="mx-auto max-w-lg px-4 py-20 text-center outline-none">
+        <h1 className="text-2xl font-bold">{empresa.nombre} pausó su catálogo</h1>
+        <p className="mt-2 text-tenue">Por ahora no recibe pedidos por aquí. Vuelve más tarde o contacta a la empresa.</p>
+        {comprador && (
+          <Link to="/cuenta" className="mt-6 inline-flex min-h-11 items-center rounded-control border border-control px-4 font-semibold hover:bg-hundido">
+            Ver mis pedidos
+          </Link>
+        )}
+      </main>
+    );
+  }
 
   const { marca, texto } = marcaSegura(empresa.color);
   const estilo = { "--marca": marca, "--marca-texto": texto } as CSSProperties;

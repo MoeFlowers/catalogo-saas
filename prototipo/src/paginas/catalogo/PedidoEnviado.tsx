@@ -1,7 +1,7 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router";
-import { usePedidos } from "../../estado/pedidos";
+import { usePedido } from "../../estado/datos";
 import { mensajeWhatsApp, numeroPedido } from "../../lib/pedido";
 import { Boton, BotonEnlace, clasesBoton } from "../../ui/Boton";
 import { Aviso } from "../../ui/piezas";
@@ -24,7 +24,7 @@ export function IconoWhatsApp() {
 export function PedidoEnviado() {
   const empresa = useEmpresa();
   const { pedidoId } = useParams();
-  const pedido = usePedidos((s) => s.lista.find((p) => p.id === pedidoId));
+  const pedido = usePedido(pedidoId);
   const [copiado, setCopiado] = useState<"si" | "error" | null>(null);
 
   if (!pedido || pedido.empresa !== empresa.slug) return <NoEncontrado />;

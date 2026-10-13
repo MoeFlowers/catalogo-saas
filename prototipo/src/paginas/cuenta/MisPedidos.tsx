@@ -1,9 +1,11 @@
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
-import { EMPRESAS } from "../../datos/empresas";
 import type { EstadoPedido } from "../../datos/tipos";
-import { NOMBRE_ESTADO, usePedidos } from "../../estado/pedidos";
+import { useShallow } from "zustand/react/shallow";
+import { useDatos } from "../../estado/datos";
+import { NOMBRE_ESTADO } from "../../estado/pedidos";
+import { useSesion } from "../../estado/sesion";
 import { formatear, formatearFecha } from "../../lib/dinero";
 import { numeroPedido } from "../../lib/pedido";
 import { BotonEnlace } from "../../ui/Boton";
@@ -23,7 +25,9 @@ export function InsigniaEstado({ estado }: { estado: EstadoPedido }) {
 }
 
 export function MisPedidos() {
-  const lista = usePedidos((s) => s.lista);
+  const correo = useSesion((s) => s.comprador?.correo);
+  const lista = useDatos(useShallow((s) => s.pedidos.filter((p) => p.compradorCorreo === correo)));
+  const EMPRESAS = useDatos((s) => s.empresas);
   const [empresa, setEmpresa] = useState("");
   const visibles = [...lista].filter((p) => !empresa || p.empresa === empresa).sort((a, b) => b.fecha.localeCompare(a.fecha));
   const conPedidos = EMPRESAS.filter((e) => lista.some((p) => p.empresa === e.slug));

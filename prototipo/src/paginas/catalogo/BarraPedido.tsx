@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import type { Empresa } from "../../datos/tipos";
 import { useCarrito } from "../../estado/carrito";
+import { useDatos } from "../../estado/datos";
 import { useTasas } from "../../estado/tasas";
 import { formatear } from "../../lib/dinero";
 import { calcularLinea } from "../../lib/pedido";
@@ -9,10 +10,11 @@ import { calcularLinea } from "../../lib/pedido";
 export function BarraPedido({ empresa }: { empresa: Empresa }) {
   const lineas = useCarrito((s) => s.porEmpresa[empresa.slug]) ?? [];
   const tasas = useTasas((s) => s.tasas);
+  const productos = useDatos((s) => s.productos);
   if (lineas.length === 0) return null;
 
   const totalBs = tasas
-    ? lineas.reduce((s, l) => s + (calcularLinea(l, empresa, tasas)?.totalBsCent ?? 0), 0)
+    ? lineas.reduce((s, l) => s + (calcularLinea(l, empresa, tasas, productos)?.totalBsCent ?? 0), 0)
     : null;
 
   return (

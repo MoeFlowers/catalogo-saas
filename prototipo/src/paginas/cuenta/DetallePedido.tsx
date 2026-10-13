@@ -1,10 +1,10 @@
 import { ChevronLeft } from "lucide-react";
 import type { CSSProperties } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { empresaPorSlug } from "../../datos/empresas";
-import { productoPorId } from "../../datos/productos";
 import { useCarrito } from "../../estado/carrito";
-import { EXPLICACION_ESTADO, NOMBRE_ESTADO, usePedidos } from "../../estado/pedidos";
+import { useDatos, useEmpresaPorSlug, usePedido } from "../../estado/datos";
+import { EXPLICACION_ESTADO, NOMBRE_ESTADO } from "../../estado/pedidos";
+import { useSesion } from "../../estado/sesion";
 import { marcaSegura } from "../../lib/color";
 import { formatear, formatearFecha, formatearTasa, refUsd } from "../../lib/dinero";
 import { mensajeWhatsApp, NOMBRE_ENTREGA, numeroPedido } from "../../lib/pedido";
@@ -17,14 +17,16 @@ import { InsigniaEstado } from "./MisPedidos";
 export function DetallePedido() {
   const { id } = useParams();
   const navegar = useNavigate();
-  const pedido = usePedidos((s) => s.lista.find((p) => p.id === id));
+  const pedido = usePedido(id);
+  const correo = useSesion((s) => s.comprador?.correo);
+  const productos = useDatos((s) => s.productos);
   const reemplazar = useCarrito((s) => s.reemplazar);
-  const empresa = empresaPorSlug(pedido?.empresa);
-  if (!pedido || !empresa) return <NoEncontrado />;
+  const empresa = useEmpresaPorSlug(pedido?.empresa);
+  if (!pedido || !empresa || pedido.compradorCorreo !== correo) return <NoEncontrado />;
 
   const tasasPedido = { bcv: pedido.tasa, usdt: pedido.tasa, eur: null, fecha: pedido.fechaTasa, origen: "en-vivo" as const };
   const { marca, texto } = marcaSegura(empresa.color);
-  const disponibles = pedido.items.filter((i) => productoPorId(i.productoId));
+  const disponibles = pedido.items.filter((i) => productos.some((p) => p.id === i.productoId && p.activo));
 
   const repetir = () => {
     reemplazar(

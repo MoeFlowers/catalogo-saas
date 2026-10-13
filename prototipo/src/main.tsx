@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, type ComponentType } from "react";
 import { createRoot } from "react-dom/client";
 import { createHashRouter, RouterProvider } from "react-router";
 import "./index.css";
@@ -15,6 +15,13 @@ import { MisPedidos } from "./paginas/cuenta/MisPedidos";
 import { DetallePedido } from "./paginas/cuenta/DetallePedido";
 import { MisDatos } from "./paginas/cuenta/MisDatos";
 import { NoEncontrado } from "./paginas/NoEncontrado";
+
+// El panel se descarga aparte: quien solo compra no carga el código de la empresa
+const panel = (archivo: string, componente: string) => async () => {
+  const modulos = import.meta.glob("./paginas/panel/*.tsx");
+  const m = (await modulos[`./paginas/panel/${archivo}.tsx`]!()) as Record<string, ComponentType>;
+  return { Component: m[componente] };
+};
 
 // Rutas con hash: GitHub Pages no reescribe rutas, así que recargar cualquier pantalla sigue funcionando
 const router = createHashRouter([
@@ -41,6 +48,27 @@ const router = createHashRouter([
           { index: true, element: <MisPedidos /> },
           { path: "pedidos/:id", element: <DetallePedido /> },
           { path: "datos", element: <MisDatos /> },
+        ],
+      },
+      { path: "/panel/entrar", lazy: panel("PanelEntrar", "PanelEntrar") },
+      {
+        path: "/panel",
+        lazy: panel("PanelLayout", "PanelLayout"),
+        children: [
+          { index: true, lazy: panel("PanelInicio", "PanelInicio") },
+          { path: "pedidos", lazy: panel("PanelPedidos", "PanelPedidos") },
+          { path: "pedidos/:id", lazy: panel("PanelPedido", "PanelPedido") },
+          { path: "productos", lazy: panel("PanelProductos", "PanelProductos") },
+          { path: "productos/:id", lazy: panel("EditorProducto", "EditorProducto") },
+          { path: "inventario", lazy: panel("PanelInventario", "PanelInventario") },
+          { path: "clientes", lazy: panel("PanelClientes", "PanelClientes") },
+          { path: "categorias", lazy: panel("PanelClientes", "PanelCategorias") },
+          { path: "entrega", lazy: panel("PanelAjustes", "PanelEntrega") },
+          { path: "catalogo", lazy: panel("PanelAjustes", "PanelCatalogo") },
+          { path: "equipo", lazy: panel("PanelCuenta", "PanelEquipo") },
+          { path: "suscripcion", lazy: panel("PanelCuenta", "PanelSuscripcion") },
+          { path: "seguridad", lazy: panel("PanelCuenta", "PanelSeguridad") },
+          { path: "mas", lazy: panel("PanelClientes", "PanelMas") },
         ],
       },
       { path: "*", element: <NoEncontrado /> },

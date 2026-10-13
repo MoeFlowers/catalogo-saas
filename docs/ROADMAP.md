@@ -38,19 +38,23 @@ Dos empresas de demostración: una ferretería mayorista y una tienda de ropa, m
 - [x] Lunes 12: limpieza del repo (sección "Primer día") y arranque de `prototipo/`
 - [x] Tokens, tipografía y componentes base: botón, campo, selector de cantidad, aviso, estado vacío,
       insignia de estado, etiqueta de precio en Bs con referencia USD (`docs/DESIGN.md`)
-- [ ] Tabla que pasa a tarjetas en celular (la necesita el panel, semana 2)
+- [x] Tabla que pasa a tarjetas en celular y diálogo accesible
 - [x] Datos de demostración: 2 empresas, 28 productos con variantes, presentaciones y escalas
 - [x] Catálogo público: portada, filtros, búsqueda, ficha de producto, barra del pedido
 - [x] Pedido: lista, mínimo de la empresa, método de entrega, inicio de sesión simulado (Google o
       correo), confirmación con el mensaje de WhatsApp real
 - [x] Cuenta del comprador: Mis pedidos, detalle, Repetir pedido, datos fiscales
-- [ ] Cuenta del comprador: libreta de direcciones
+- [x] Cuenta del comprador: libreta de direcciones, que se elige al pedir
 - [x] Action de GitHub Pages; enlace funcionando en tu teléfono
 
 ### Semana 2: paneles y revisión
 
-- [ ] Panel de empresa: Inicio, Pedidos con cambio de estado, Productos (lista y formulario completo),
+- [x] Panel de empresa: Inicio, Pedidos con cambio de estado, Productos (lista y formulario completo),
       Inventario (existencias y movimientos), Entrega, Catálogo, Equipo, Suscripción
+- [x] Además: entrada con verificación en dos pasos, Clientes, Categorías, Seguridad, ajuste de
+      cantidades antes de confirmar, cancelación automática de pendientes, nota imprimible
+- [x] El ciclo del pedido mueve el inventario: confirmar reserva, listo o despachado descuenta,
+      cancelar libera; cada cambio queda en el registro de movimientos
 - [ ] Panel de plataforma: Resumen, Solicitudes con aprobar y rechazar, Empresas, Pagos, Tasas
 - [ ] Sitio: portada, planes, registro de empresa con los pasos de doble factor, estado En revisión
 - [ ] Revisión contigo en celular y escritorio; lista de cambios

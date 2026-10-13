@@ -12,6 +12,8 @@ function producto(p: Base): Producto {
     escalas: [],
     presentaciones: [UNIDAD],
     stock: 0,
+    reservado: 0,
+    activo: true,
     stockMinimo: 5,
     minimo: 1,
     multiplo: 1,
@@ -26,11 +28,11 @@ const T = "textiles-ejemplo";
 const TALLAS = ["S", "M", "L", "XL"];
 
 function variantesTalla(sku: string, stocks: number[]) {
-  return TALLAS.map((t, i) => ({ id: t.toLowerCase(), nombre: t, sku: `${sku}-${t}`, stock: stocks[i] ?? 0 }));
+  return TALLAS.map((t, i) => ({ id: t.toLowerCase(), nombre: t, sku: `${sku}-${t}`, stock: stocks[i] ?? 0, reservado: 0 }));
 }
 
 // Productos de demostración: precios y existencias ficticios para probar escalas, presentaciones y stock.
-export const PRODUCTOS: Producto[] = [
+export const PRODUCTOS_SEMILLA: Producto[] = [
   producto({
     id: "tor-38", empresa: F, categoria: "tornilleria", nombre: "Tornillo autorroscante 3/8 x 1\"", marca: "Genérica", sku: "TOR-38",
     descripcion: "Tornillo autorroscante cabeza hexagonal, acero galvanizado. Para lámina y perfiles metálicos.",
@@ -156,12 +158,12 @@ export const PRODUCTOS: Producto[] = [
     id: "jean-trabajo", empresa: T, categoria: "pantalones", nombre: "Jean de trabajo 14 oz", marca: "Genérica", sku: "PAN-JT",
     descripcion: "Denim grueso con costuras reforzadas. Tallas 28 a 40.",
     atributo: "Talla",
-    variantes: ["28", "30", "32", "34", "36", "38", "40"].map((t, i) => ({ id: t, nombre: t, sku: `PAN-JT-${t}`, stock: [6, 20, 34, 30, 18, 4, 0][i] ?? 0 })),
+    variantes: ["28", "30", "32", "34", "36", "38", "40"].map((t, i) => ({ id: t, nombre: t, sku: `PAN-JT-${t}`, stock: [6, 20, 34, 30, 18, 4, 0][i] ?? 0, reservado: 0 })),
     precioCent: 1450, escalas: [{ desde: 12, precioCent: 1290 }], stockMinimo: 6,
   }),
   producto({
     id: "pantalon-gabardina", empresa: T, categoria: "pantalones", nombre: "Pantalón de gabardina caqui", marca: "Genérica", sku: "PAN-GC",
-    atributo: "Talla", variantes: ["30", "32", "34", "36"].map((t, i) => ({ id: t, nombre: t, sku: `PAN-GC-${t}`, stock: [10, 14, 9, 5][i] ?? 0 })),
+    atributo: "Talla", variantes: ["30", "32", "34", "36"].map((t, i) => ({ id: t, nombre: t, sku: `PAN-GC-${t}`, stock: [10, 14, 9, 5][i] ?? 0, reservado: 0 })),
     precioCent: 1180, stockMinimo: 6,
   }),
   producto({
@@ -194,11 +196,3 @@ export const PRODUCTOS: Producto[] = [
     stock: 45, stockMinimo: 60, minimo: 3,
   }),
 ];
-
-export function productosDe(empresa: string): Producto[] {
-  return PRODUCTOS.filter((p) => p.empresa === empresa);
-}
-
-export function productoPorId(id: string | undefined): Producto | undefined {
-  return PRODUCTOS.find((p) => p.id === id);
-}

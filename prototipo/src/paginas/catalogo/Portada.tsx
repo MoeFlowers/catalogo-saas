@@ -1,8 +1,8 @@
 import { Search, X } from "lucide-react";
 import { useMemo } from "react";
 import { useSearchParams } from "react-router";
-import { productosDe } from "../../datos/productos";
 import type { Producto } from "../../datos/tipos";
+import { useProductosDe } from "../../estado/datos";
 import { nivelStock, precioUnitario } from "../../lib/precio";
 import { NOMBRE_ENTREGA } from "../../lib/pedido";
 import { Boton } from "../../ui/Boton";
@@ -42,7 +42,7 @@ export function Portada() {
     setParams(p, { replace: true, preventScrollReset: true });
   };
 
-  const todos = useMemo(() => productosDe(empresa.slug), [empresa.slug]);
+  const todos = useProductosDe(empresa.slug, true);
   const visibles = useMemo(() => {
     const termino = normalizar(q.trim());
     let lista = todos.filter((p) => {

@@ -30,6 +30,26 @@ export interface Empresa {
   mostrarStock: "cantidad" | "nivel" | "oculto";
   entregas: MetodoEntrega[];
   categorias: Categoria[];
+  /** Número de WhatsApp en formato internacional. Vacío en las empresas de demostración. */
+  whatsapp: string;
+  publicado: boolean;
+  plan: IdPlan;
+  /** Fin del período de prueba o de la suscripción pagada */
+  vence: string;
+  equipo: Miembro[];
+  /** Días sin confirmar tras los que un pedido pendiente se cancela solo */
+  diasCancelacion: number;
+}
+
+export type IdPlan = "inicial" | "negocio" | "mayorista";
+
+export type Rol = "dueno" | "administrador" | "vendedor" | "almacen" | "lectura";
+
+export interface Miembro {
+  correo: string;
+  nombre: string;
+  rol: Rol;
+  estado: "activo" | "invitado";
 }
 
 /** Precio unitario desde una cantidad de unidades base */
@@ -50,6 +70,7 @@ export interface Variante {
   nombre: string;
   sku: string;
   stock: number;
+  reservado: number;
 }
 
 export interface Producto {
@@ -69,8 +90,11 @@ export interface Producto {
   presentaciones: Presentacion[];
   atributo?: string;
   variantes?: Variante[];
-  /** Stock en unidades base cuando no hay variantes */
+  /** Stock físico en unidades base cuando no hay variantes */
   stock: number;
+  /** Comprometido por pedidos confirmados, en unidades base */
+  reservado: number;
+  activo: boolean;
   stockMinimo: number;
   /** Cantidad mínima y múltiplo de venta, en unidades base */
   minimo: number;
@@ -135,7 +159,46 @@ export interface Pedido {
   destino: string;
   nota: string;
   comprador: { nombre: string; telefono: string; documento: string };
+  compradorCorreo: string;
   demostracion?: boolean;
+  /** Pedido de demostración que se le asigna al comprador del boceto cuando entra */
+  semillaComprador?: boolean;
+  /** La empresa cambió cantidades antes de confirmar */
+  ajustado?: boolean;
+}
+
+export type TipoMovimiento = "entrada" | "salida" | "ajuste" | "reserva" | "liberacion";
+
+/** Registro inmutable: el stock de cada producto es la suma de sus movimientos */
+export interface Movimiento {
+  id: string;
+  fecha: string;
+  empresa: string;
+  productoId: string;
+  varianteId?: string;
+  tipo: TipoMovimiento;
+  /** Unidades base, con signo sobre el stock físico o sobre lo reservado */
+  cantidad: number;
+  motivo: string;
+  pedidoId?: string;
+  usuario: string;
+}
+
+export interface Pago {
+  id: string;
+  empresa: string;
+  fecha: string;
+  metodo: "pago-movil" | "transferencia" | "zelle" | "usdt";
+  referencia: string;
+  montoCent: number;
+  moneda: Moneda;
+  estado: "en-revision" | "validado" | "rechazado";
+}
+
+export interface Direccion {
+  id: string;
+  nombre: string;
+  detalle: string;
 }
 
 export interface Comprador {
@@ -145,4 +208,5 @@ export interface Comprador {
   documento: string;
   razonSocial: string;
   metodo: "google" | "correo";
+  direcciones: Direccion[];
 }

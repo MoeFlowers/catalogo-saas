@@ -1,4 +1,3 @@
-import { productoPorId } from "../datos/productos";
 import type { Empresa, ItemPedido, LineaPedido, Pedido, Producto, Tasas } from "../datos/tipos";
 import { aBs, formatear, formatearFecha, formatearTasa, refUsd } from "./dinero";
 import { presentacion, precioUnitario } from "./precio";
@@ -14,8 +13,8 @@ export interface LineaCalculada {
   totalBsCent: number;
 }
 
-export function calcularLinea(linea: LineaPedido, empresa: Empresa, tasas: Tasas): LineaCalculada | null {
-  const producto = productoPorId(linea.productoId);
+export function calcularLinea(linea: LineaPedido, empresa: Empresa, tasas: Tasas, productos: Producto[]): LineaCalculada | null {
+  const producto = productos.find((p) => p.id === linea.productoId);
   if (!producto) return null;
   const pres = presentacion(producto, linea.presentacionId);
   const unidadesBase = linea.cantidad * pres.factor;

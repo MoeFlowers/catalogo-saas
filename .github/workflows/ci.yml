@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, "feature/**", "fix/**", "chore/**"]
+    paths-ignore: ["prototipo/**", "docs/**", "*.md"]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: vitrina_owner
+          POSTGRES_PASSWORD: solo-desarrollo
+          POSTGRES_DB: vitrina
+        ports: ["54320:5432"]
+        options: >-
+          --health-cmd "pg_isready -U vitrina_owner -d vitrina"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      CI: "true"
+      APP_ENV: test
+      APP_URL: http://localhost:4200
+      DATABASE_URL: postgres://app_runtime:solo-desarrollo@localhost:54320/vitrina
+      DATABASE_OWNER_URL: postgres://vitrina_owner:solo-desarrollo@localhost:54320/vitrina
+      DATABASE_TEST_URL: postgres://vitrina_owner:solo-desarrollo@localhost:54320/vitrina_test
+      DATABASE_TEST_RUNTIME_URL: postgres://app_runtime:solo-desarrollo@localhost:54320/vitrina_test
+      ADMIN_EMAILS: admin@vitrina.test
+      S3_ENDPOINT: http://localhost:8333
+      S3_BUCKET: vitrina-imagenes
+      S3_ACCESS_KEY: vitrina
+      S3_SECRET_KEY: solo-desarrollo
+      S3_PUBLIC_URL: http://localhost:8333/vitrina-imagenes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Secreto de sesiones solo para esta corrida
+      - run: echo "BETTER_AUTH_SECRET=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+      - name: Roles y base de pruebas
+        env:
+          PGPASSWORD: solo-desarrollo
+        run: |
+          for f in docker/postgres/*.sql; do psql -h localhost -p 54320 -U vitrina_owner -d vitrina -v ON_ERROR_STOP=1 -f "$f"; done
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm db:migrar:ci
+      - run: pnpm test
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright
+          path: test-results/
+          retention-days: 7

@@ -1,0 +1,45 @@
+# Entorno de desarrollo de Vitrina: todo corre en tu PC, sin servicios pagos.
+#   docker compose up -d
+# Puertos en el host con un 0 de más para no chocar con instalaciones locales.
+name: vitrina
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: vitrina_owner
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-solo-desarrollo}
+      POSTGRES_DB: vitrina
+    ports:
+      - "54320:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./docker/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vitrina_owner -d vitrina"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Almacenamiento de imágenes compatible con S3 (ADR-0004). SeaweedFS en lugar de MinIO: MinIO dejó
+  # de publicar sus imágenes en los registros públicos. La app habla S3, así que da igual el proveedor.
+  # Lectura pública para servir las fotos; escribir requiere las credenciales de docker/seaweedfs/s3.json.
+  s3:
+    image: chrislusf/seaweedfs:latest
+    command: server -dir=/data -s3 -s3.config=/etc/seaweedfs/s3.json -s3.port=8333
+    ports:
+      - "8333:8333"
+    volumes:
+      - s3:/data
+      - ./docker/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+
+  # Recibe todos los correos en desarrollo: se ven en http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  db:
+  s3:

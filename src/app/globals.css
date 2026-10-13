@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@import "@fontsource-variable/plus-jakarta-sans";
+
+/* Tokens de docs/DESIGN.md, los mismos del boceto. La marca de cada empresa llega como --marca y --marca-texto. */
+@theme {
+  --font-sans: "Plus Jakarta Sans Variable", system-ui, sans-serif;
+
+  --color-fondo: #f8fafc;
+  --color-superficie: #ffffff;
+  --color-tinta: #1e293b;
+  --color-tenue: #475569;
+  --color-linea: #e2e8f0;
+  --color-control: #7c8ba1;
+  --color-hundido: #f1f5f9;
+  --color-accion: #2563eb;
+  --color-accion-hover: #1d4ed8;
+  --color-peligro: #b91c1c;
+  --color-exito: #15803d;
+  --color-alerta: #b45309;
+
+  --radius-control: 8px;
+  --radius-tarjeta: 12px;
+}
+
+/* inline: la utilidad usa var(--marca) en el elemento, así cada catálogo hereda el color de su empresa */
+@theme inline {
+  --color-marca: var(--marca, #2563eb);
+  --color-marca-texto: var(--marca-texto, #ffffff);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-fondo text-tinta font-sans antialiased;
+    line-height: 1.5;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accion);
+    outline-offset: 2px;
+  }
+  /* Dentro de un catálogo el foco toma el color de la empresa (ya validado a 4.5:1 contra blanco) */
+  [data-catalogo] :focus-visible {
+    outline-color: var(--marca, #2563eb);
+  }
+}
+
+@utility cifras {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

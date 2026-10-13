@@ -73,12 +73,12 @@ Dos empresas de demostración: una ferretería mayorista y una tienda de ropa, m
 **Objetivo:** la base técnica real, sin funciones de negocio todavía. Corresponde a los sprints 1.2 a
 1.6 de `docs/PHASE-1-PLAN.md`.
 
-- [ ] 1.2 Aplicación Next.js con TypeScript estricto, lint y formato, estructura de módulos
-- [ ] 1.3 Base de datos: Drizzle, migraciones, esquema inicial, datos de ejemplo
-- [ ] 1.4 Docker Compose: PostgreSQL, MinIO y Mailpit con un solo comando
-- [ ] 1.5 Pruebas: Vitest, Playwright y `@axe-core/playwright` en cada pantalla dentro del CI
+- [x] 1.2 Aplicación Next.js 16 con TypeScript estricto, ESLint, Prettier, variables validadas con Zod, salud
+- [x] 1.3 Base de datos: Drizzle, esquema completo del dominio, rol app_runtime y seguridad por fila (44 políticas)
+- [x] 1.4 Docker Compose: PostgreSQL 16, SeaweedFS (S3; MinIO ya no publica imágenes) y Mailpit
+- [x] 1.5 Pruebas: Vitest (aislamiento entre empresas contra PostgreSQL real), Playwright y axe
 - [ ] Presupuesto de rendimiento en el CI, como ya tiene el boceto (`prototipo/scripts/presupuesto.mjs`)
-- [ ] 1.6 CI en GitHub Actions: lint, tipos, pruebas y build en cada rama
+- [x] 1.6 CI en GitHub Actions: lint, tipos, migraciones, pruebas, build y extremo a extremo
 - [x] ADR-0005 Confirmación y avisos de pedidos por WhatsApp (escrito el 13 oct)
 - [ ] ADR-0006 Autoregistro, cuentas de comprador y biblioteca de autenticación (prueba corta de
       Better Auth)

@@ -1,9 +1,9 @@
 "use server";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { conContexto, db } from "@/lib/db";
-import { blockedBuyers, buyerAddresses, buyerProfiles, orders } from "@/lib/db/esquema";
+import { blockedBuyers, buyerAddresses, buyerProfiles, orders, user } from "@/lib/db/esquema";
 import { fallo, ok, type Resultado } from "@/lib/errores";
 import { registro } from "@/lib/registro";
 import { suscripcionVencida } from "@/dominio/permisos";
@@ -118,4 +118,43 @@ export async function perfilComprador() {
     razonSocial: perfil?.razonSocial ?? "",
     direcciones: direcciones.map((d) => ({ id: d.id, nombre: d.nombre, detalle: d.detalle })),
   };
+}
+
+const esquemaPerfil = z.object({
+  nombre: z.string().trim().min(3, "Escribe tu nombre.").max(120),
+  telefono: z
+    .string()
+    .trim()
+    .refine((t) => t === "" || t.replace(/\D/g, "").length >= 10, "Escribe el teléfono con código de área, por ejemplo 0414 1234567."),
+  documento: z.string().trim().max(20),
+  razonSocial: z.string().trim().max(160),
+});
+
+export async function guardarPerfil(datos: z.input<typeof esquemaPerfil>): Promise<Resultado<null>> {
+  const s = await sesionActual();
+  if (!s) return fallo("Tu sesión venció. Entra de nuevo.");
+  const r = esquemaPerfil.safeParse(datos);
+  if (!r.success) return fallo(r.error.issues[0]?.message ?? "Revisa tus datos.", Object.fromEntries(r.error.issues.map((i) => [String(i.path[0]), i.message])));
+  const { nombre, ...perfil } = r.data;
+  await db.update(user).set({ name: nombre, updatedAt: new Date() }).where(eq(user.id, s.user.id));
+  await db.insert(buyerProfiles).values({ userId: s.user.id, ...perfil }).onConflictDoUpdate({ target: buyerProfiles.userId, set: perfil });
+  return ok(null);
+}
+
+export async function agregarDireccion(nombre: string, detalle: string): Promise<Resultado<null>> {
+  const s = await sesionActual();
+  if (!s) return fallo("Tu sesión venció. Entra de nuevo.");
+  if (nombre.trim().length < 2) return fallo("Ponle un nombre, por ejemplo Depósito.", { "dir-nombre": "Ponle un nombre, por ejemplo Depósito." });
+  if (detalle.trim().length < 8) return fallo("Escribe la dirección completa.", { "dir-detalle": "Escribe la dirección completa o la ciudad y agencia de destino." });
+  const [{ n } = { n: 0 }] = await db.select({ n: count() }).from(buyerAddresses).where(eq(buyerAddresses.userId, s.user.id));
+  if (n >= 20) return fallo("Puedes guardar hasta 20 direcciones.");
+  await db.insert(buyerAddresses).values({ userId: s.user.id, nombre: nombre.trim().slice(0, 60), detalle: detalle.trim().slice(0, 300) });
+  return ok(null);
+}
+
+export async function quitarDireccion(id: string): Promise<Resultado<null>> {
+  const s = await sesionActual();
+  if (!s || !/^[0-9a-f-]{36}$/i.test(id)) return fallo("No se pudo quitar la dirección.");
+  await db.delete(buyerAddresses).where(and(eq(buyerAddresses.id, id), eq(buyerAddresses.userId, s.user.id)));
+  return ok(null);
 }
